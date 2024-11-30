@@ -1,6 +1,5 @@
-"use client"
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import {
   BookOpen,
@@ -9,10 +8,14 @@ import {
   Clock,
   Star,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 const LandingPage = () => {
   const router = useRouter();
+
+  const handleLoginNavigation = () => {
+    router.push("/auth/login");
+  };
 
   const testimonials = [
     {
@@ -26,10 +29,6 @@ const LandingPage = () => {
       role: "University Professor",
     },
   ];
-
-  const handleAuthNavigation = () => {
-    router.push("/auth/login");
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
@@ -51,10 +50,8 @@ const LandingPage = () => {
           </a>
         </div>
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" onClick={handleAuthNavigation}>
-            Log In
-          </Button>
-          <Button onClick={handleAuthNavigation}>Sign Up</Button>
+          <Button variant="ghost" onClick={handleLoginNavigation}>Log In</Button>
+          <Button onClick={handleLoginNavigation}>Sign Up</Button>
         </div>
       </nav>
 
@@ -70,15 +67,11 @@ const LandingPage = () => {
             customized to your needs.
           </p>
           <div className="flex flex-col md:flex-row justify-center gap-4">
-            <Button
-              size="lg"
-              className="bg-blue-600 hover:bg-blue-700"
-              onClick={handleAuthNavigation}
-            >
+            <Button size="lg" className="bg-blue-600 hover:bg-blue-700" onClick={handleLoginNavigation}>
               Start Creating Your Course
               <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
-            <Button size="lg" variant="outline" onClick={handleAuthNavigation}>
+            <Button size="lg" variant="outline" onClick={handleLoginNavigation}>
               Learn More
               <BookOpen className="ml-2 h-4 w-4" />
             </Button>
@@ -153,11 +146,7 @@ const LandingPage = () => {
             high-quality course materials. Focus on teaching, while we handle
             the content.
           </p>
-          <Button
-            size="lg"
-            className="mt-8 bg-blue-600 hover:bg-blue-700"
-            onClick={handleAuthNavigation}
-          >
+          <Button size="lg" className="mt-8 bg-blue-600 hover:bg-blue-700" onClick={handleLoginNavigation}>
             Get Started Now
             <ChevronRight className="ml-2 h-4 w-4" />
           </Button>

@@ -1,5 +1,3 @@
-"use client"
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,7 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { GraduationCap } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 
 const RegisterPage = () => {
   const router = useRouter();

@@ -1,4 +1,3 @@
-"use client"
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -9,7 +8,7 @@ import {
   Clock,
   Star,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 
 const LandingPage = () => {
   const router = useRouter();

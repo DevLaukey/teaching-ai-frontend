@@ -1,5 +1,3 @@
-"use client"
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { GraduationCap } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 
 const LoginPage = () => {
   const router = useRouter();
