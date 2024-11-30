@@ -1,4 +1,3 @@
-"use client"
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,12 +25,10 @@ import {
   GraduationCap,
   Laptop,
   HelpCircle,
+  Menu,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 const Dashboard = () => {
-  const router = useRouter();
-
   // Mock data for courses
   const recentCourses = [
     {
@@ -82,16 +79,6 @@ const Dashboard = () => {
     },
   ];
 
-  const handleLogout = () => {
-    localStorage.removeItem("isAuthenticated");
-    localStorage.removeItem("userProfile");
-    router.push("/auth/login");
-  };
-
-  const handleCourseClick = (courseId) => {
-    router.push(`/courses/${courseId}`);
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -99,10 +86,7 @@ const Dashboard = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
-            <div
-              className="flex items-center space-x-2 cursor-pointer"
-              onClick={() => router.push("/dashboard")}
-            >
+            <div className="flex items-center space-x-2">
               <GraduationCap className="h-8 w-8 text-blue-600" />
               <span className="text-xl font-bold">EduAI</span>
             </div>
@@ -131,17 +115,14 @@ const Dashboard = () => {
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => router.push("/settings")}>
+                  <DropdownMenuItem>
                     <User className="mr-2 h-4 w-4" /> Profile
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => router.push("/settings")}>
+                  <DropdownMenuItem>
                     <Settings className="mr-2 h-4 w-4" /> Settings
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="text-red-600"
-                    onClick={handleLogout}
-                  >
+                  <DropdownMenuItem className="text-red-600">
                     <LogOut className="mr-2 h-4 w-4" /> Logout
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -156,32 +137,19 @@ const Dashboard = () => {
         <div className="flex flex-col md:flex-row gap-6">
           {/* Sidebar */}
           <aside className="w-full md:w-64 space-y-2">
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => router.push("/dashboard")}
-            >
+            <Button variant="ghost" className="w-full justify-start">
               <BarChart className="mr-2 h-4 w-4" /> Dashboard
             </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => router.push("/course")}
-            >
+            <Button variant="ghost" className="w-full justify-start">
               <Book className="mr-2 h-4 w-4" /> My Courses
             </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => router.push("/settings")}
-            >
+            <Button variant="ghost" className="w-full justify-start">
+              <Laptop className="mr-2 h-4 w-4" /> LMS Integration
+            </Button>
+            <Button variant="ghost" className="w-full justify-start">
               <Settings className="mr-2 h-4 w-4" /> Settings
             </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => router.push("/support")}
-            >
+            <Button variant="ghost" className="w-full justify-start">
               <HelpCircle className="mr-2 h-4 w-4" /> Support
             </Button>
           </aside>
@@ -192,10 +160,7 @@ const Dashboard = () => {
             <div className="grid md:grid-cols-2 gap-4">
               <Card>
                 <CardContent className="pt-6">
-                  <Button
-                    className="w-full space-x-2"
-                    onClick={() => router.push("/course/creation")}
-                  >
+                  <Button className="w-full space-x-2">
                     <Plus className="h-4 w-4" />
                     <span>Create New Course</span>
                   </Button>
@@ -261,8 +226,7 @@ const Dashboard = () => {
                   {recentCourses.map((course) => (
                     <div
                       key={course.id}
-                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100"
-                      onClick={() => handleCourseClick(course.id)}
+                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
                     >
                       <div className="flex items-center space-x-4">
                         <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -276,24 +240,10 @@ const Dashboard = () => {
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            router.push(`/courses/${course.id}/edit`);
-                          }}
-                        >
+                        <Button variant="ghost" size="icon">
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            // Handle download
-                          }}
-                        >
+                        <Button variant="ghost" size="icon">
                           <Download className="h-4 w-4" />
                         </Button>
                       </div>

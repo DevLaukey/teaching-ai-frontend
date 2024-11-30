@@ -135,7 +135,7 @@ const MyCourses = () => {
   };
 
   const handleCourseClick = (courseId) => {
-    router.push(`/course/${courseId}`);
+    router.push(`/courses/${courseId}`);
   };
 
   const handleCreateCourse = () => {

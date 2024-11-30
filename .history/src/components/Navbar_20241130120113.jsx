@@ -21,7 +21,7 @@ import {
   User,
   HelpCircle,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import Link from "next/link";
 
 const Navigation = () => {

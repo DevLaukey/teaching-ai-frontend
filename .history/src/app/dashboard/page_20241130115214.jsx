@@ -27,7 +27,7 @@ import {
   Laptop,
   HelpCircle,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 
 const Dashboard = () => {
   const router = useRouter();
@@ -166,7 +166,7 @@ const Dashboard = () => {
             <Button
               variant="ghost"
               className="w-full justify-start"
-              onClick={() => router.push("/course")}
+              onClick={() => router.push("/courses")}
             >
               <Book className="mr-2 h-4 w-4" /> My Courses
             </Button>
