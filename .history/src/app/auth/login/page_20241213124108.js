@@ -29,18 +29,17 @@ const LoginPage = () => {
     setIsLoading(true);
 
     try {
-     const response = await fetch(`${backendUrl}/token/login`, {
-       method: "POST",
-       headers: {
-         "Content-Type": "application/json",
-       },
-       body: JSON.stringify({
-         email,
-         password,
-       }),
-       mode: "cors", // Add this
-       credentials: "include", // This allows cookies to be sent
-     });
+      const response = await fetch(`${backendUrl}/token/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+        credentials: "include", // Important for handling cookies
+      });
 
       const data = await response.json();
 

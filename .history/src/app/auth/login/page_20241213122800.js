@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { GraduationCap, Loader2 } from "lucide-react";
+import { GraduationCap } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const LoginPage = () => {
@@ -19,61 +19,30 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-  const handleLogin = async (e) => {
+  // Dummy user credentials
+  const dummyUser = {
+    email: "test@example.com",
+    password: "password123",
+  };
+
+  const handleLogin = (e) => {
     e.preventDefault();
-    setError("");
-    setIsLoading(true);
-
-    try {
-     const response = await fetch(`${backendUrl}/token/login`, {
-       method: "POST",
-       headers: {
-         "Content-Type": "application/json",
-       },
-       body: JSON.stringify({
-         email,
-         password,
-       }),
-       mode: "cors", // Add this
-       credentials: "include", // This allows cookies to be sent
-     });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed");
-      }
-
-      // Store the token if your backend sends one
-      if (data.token) {
-        localStorage.setItem("token", data.token);
-      }
-
-      // Store any user data
-      if (data.user) {
-        localStorage.setItem("user", JSON.stringify(data.user));
-      }
-
-      // Redirect to dashboard
-      router.push("/dashboard");
-    } catch (err) {
-      setError(err.message || "Failed to login. Please try again.");
-    } finally {
-      setIsLoading(false);
+    if (email === dummyUser.email && password === dummyUser.password) {
+      // In a real app, you'd set proper auth tokens here
+      localStorage.setItem("isAuthenticated", "true");
+      router.push("/dashboard"); // Navigate to dashboard after login
+    } else {
+      setError("Invalid credentials. Try test@example.com / password123");
     }
   };
 
-  const handleGoogleLogin = async () => {
-    try {
-      // Redirect to Google OAuth endpoint on your backend
-      window.location.href = `${backendUrl}/auth/google`;
-    } catch (err) {
-      setError("Failed to initiate Google login");
-    }
+  const handleGoogleLogin = () => {
+    // In a real app, this would trigger Google OAuth
+    localStorage.setItem("isAuthenticated", "true");
+    router.push("/dashboard");
   };
 
   return (
@@ -104,7 +73,6 @@ const LoginPage = () => {
               className="w-full relative"
               type="button"
               onClick={handleGoogleLogin}
-              disabled={isLoading}
             >
               <div className="absolute left-4">
                 <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -143,9 +111,7 @@ const LoginPage = () => {
             {/* Email/Password Form */}
             <form className="space-y-4" onSubmit={handleLogin}>
               {error && (
-                <div className="p-3 text-sm text-red-600 bg-red-50 rounded-md text-center">
-                  {error}
-                </div>
+                <div className="text-sm text-red-600 text-center">{error}</div>
               )}
 
               <div className="space-y-2">
@@ -157,7 +123,6 @@ const LoginPage = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  disabled={isLoading}
                 />
               </div>
 
@@ -170,19 +135,11 @@ const LoginPage = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  disabled={isLoading}
                 />
               </div>
 
-              <Button className="w-full" type="submit" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Signing in...
-                  </>
-                ) : (
-                  "Sign In"
-                )}
+              <Button className="w-full" type="submit">
+                Sign In
               </Button>
             </form>
 
@@ -192,7 +149,6 @@ const LoginPage = () => {
               <button
                 onClick={() => router.push("/auth/register")}
                 className="text-blue-600 hover:text-blue-500 font-medium"
-                disabled={isLoading}
               >
                 Sign up
               </button>
