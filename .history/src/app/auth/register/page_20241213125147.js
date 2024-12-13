@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { GraduationCap, Loader2 } from "lucide-react";
+import { GraduationCap } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const RegisterPage = () => {
@@ -34,8 +34,6 @@ const RegisterPage = () => {
   });
   const [errors, setErrors] = useState({});
   const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [serverError, setServerError] = useState("");
 
   const validateForm = () => {
     const newErrors = {};
@@ -95,59 +93,54 @@ const RegisterPage = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true); // Add loading state
-    setServerError(""); // Add server error state
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setIsLoading(true); // Add loading state
+  setServerError(""); // Add server error state
 
-    if (validateForm()) {
-      try {
-        const response = await fetch(
-          "https://eduai-rsjn.onrender.com/register",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              firstName: formData.firstName,
-              lastName: formData.lastName,
-              email: formData.email,
-              password: formData.password,
-              role: formData.role,
-            }),
-            mode: "cors",
-            credentials: "include",
-          }
-        );
+  if (validateForm()) {
+    try {
+      const response = await fetch("https://eduai-rsjn.onrender.com/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          password: formData.password,
+          role: formData.role,
+        }),
+        mode: "cors",
+        credentials: "include",
+      });
 
-        const data = await response.json();
+      const data = await response.json();
 
-        if (!response.ok) {
-          throw new Error(data.message || "Registration failed");
-        }
-
-        // Store the token if your backend sends one
-        if (data.token) {
-          localStorage.setItem("token", data.token);
-        }
-
-        // Store user data if needed
-        if (data.user) {
-          localStorage.setItem("user", JSON.stringify(data.user));
-        }
-
-        // Redirect to dashboard on success
-        router.push("/dashboard");
-      } catch (error) {
-        setServerError(
-          error.message || "Failed to register. Please try again."
-        );
-      } finally {
-        setIsLoading(false);
+      if (!response.ok) {
+        throw new Error(data.message || "Registration failed");
       }
+
+      // Store the token if your backend sends one
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+
+      // Store user data if needed
+      if (data.user) {
+        localStorage.setItem("user", JSON.stringify(data.user));
+      }
+
+      // Redirect to dashboard on success
+      router.push("/dashboard");
+    } catch (error) {
+      setServerError(error.message || "Failed to register. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }
+};
 
   const handleGoogleSignUp = () => {
     // In a real app, this would trigger Google OAuth
@@ -187,11 +180,6 @@ const RegisterPage = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {serverError && (
-              <div className="mb-4 p-3 text-sm text-red-600 bg-red-50 rounded-md">
-                {serverError}
-              </div>
-            )}
             {/* Google Sign Up */}
             <Button
               variant="outline"
@@ -245,7 +233,6 @@ const RegisterPage = () => {
                     value={formData.firstName}
                     onChange={handleChange}
                     required
-                    disabled={isLoading}
                   />
                   {errors.firstName && (
                     <p className="text-xs text-red-500">{errors.firstName}</p>
@@ -254,7 +241,6 @@ const RegisterPage = () => {
                 <div className="space-y-2">
                   <Label htmlFor="lastName">Last Name</Label>
                   <Input
-                    disabled={isLoading}
                     id="lastName"
                     name="lastName"
                     placeholder="Doe"
@@ -272,7 +258,6 @@ const RegisterPage = () => {
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
-                  disabled={isLoading}
                   name="email"
                   type="email"
                   placeholder="name@example.com"
@@ -309,7 +294,6 @@ const RegisterPage = () => {
                   id="password"
                   name="password"
                   type="password"
-                  disabled={isLoading}
                   placeholder="Create a password"
                   value={formData.password}
                   onChange={handleChange}
@@ -326,7 +310,6 @@ const RegisterPage = () => {
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <Input
-                  disabled={isLoading}
                   id="confirmPassword"
                   name="confirmPassword"
                   type="password"
@@ -363,15 +346,8 @@ const RegisterPage = () => {
                 <p className="text-xs text-red-500">{errors.terms}</p>
               )}
 
-              <Button className="w-full" type="submit" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating Account...
-                  </>
-                ) : (
-                  "Create Account"
-                )}
+              <Button className="w-full" type="submit">
+                Create Account
               </Button>
             </form>
 

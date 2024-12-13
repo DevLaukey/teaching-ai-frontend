@@ -187,11 +187,6 @@ const RegisterPage = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {serverError && (
-              <div className="mb-4 p-3 text-sm text-red-600 bg-red-50 rounded-md">
-                {serverError}
-              </div>
-            )}
             {/* Google Sign Up */}
             <Button
               variant="outline"
@@ -245,7 +240,6 @@ const RegisterPage = () => {
                     value={formData.firstName}
                     onChange={handleChange}
                     required
-                    disabled={isLoading}
                   />
                   {errors.firstName && (
                     <p className="text-xs text-red-500">{errors.firstName}</p>
@@ -254,7 +248,6 @@ const RegisterPage = () => {
                 <div className="space-y-2">
                   <Label htmlFor="lastName">Last Name</Label>
                   <Input
-                    disabled={isLoading}
                     id="lastName"
                     name="lastName"
                     placeholder="Doe"
@@ -272,7 +265,6 @@ const RegisterPage = () => {
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
-                  disabled={isLoading}
                   name="email"
                   type="email"
                   placeholder="name@example.com"
@@ -309,7 +301,6 @@ const RegisterPage = () => {
                   id="password"
                   name="password"
                   type="password"
-                  disabled={isLoading}
                   placeholder="Create a password"
                   value={formData.password}
                   onChange={handleChange}
@@ -326,7 +317,6 @@ const RegisterPage = () => {
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <Input
-                  disabled={isLoading}
                   id="confirmPassword"
                   name="confirmPassword"
                   type="password"
