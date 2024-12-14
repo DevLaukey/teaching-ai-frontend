@@ -44,9 +44,7 @@ const LoginPage = () => {
         credentials: "include",
       });
 
-
-      console.log("Response", response.body.locked.valueOf());
-      const data = await response.body.json();
+      const data = await response.json();
 
       if (!response.ok) {
         throw new Error(data.message || "Login failed");
@@ -56,7 +54,7 @@ const LoginPage = () => {
 
       // Store the token if your backend sends one
       if (data.auth_token) {
-        localStorage.setItem("token", data.auth_token);
+        localStorage.setItem("token", data.token);
       }
 
       // Store any user data

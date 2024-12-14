@@ -29,34 +29,31 @@ const LoginPage = () => {
     setIsLoading(true);
 
     try {
+
       console.log("Login Credentials", email);
       console.log("Password: " + password);
-      const response = await fetch(`${backendUrl}auth/token/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-        mode: "cors", // Add this
-        credentials: "include",
-      });
+     const response = await fetch(`${backendUrl}/token/login`, {
+       method: "POST",
+       headers: {
+         "Content-Type": "application/json",
+       },
+       body: JSON.stringify({
+         email,
+         password,
+       }),
+       mode: "cors", // Add this
+       credentials: "include", 
+     });
 
-
-      console.log("Response", response.body.locked.valueOf());
-      const data = await response.body.json();
+      const data = await response.json();
 
       if (!response.ok) {
         throw new Error(data.message || "Login failed");
       }
 
-      console.log(data);
-
       // Store the token if your backend sends one
-      if (data.auth_token) {
-        localStorage.setItem("token", data.auth_token);
+      if (data.token) {
+        localStorage.setItem("token", data.token);
       }
 
       // Store any user data
@@ -73,11 +70,11 @@ const LoginPage = () => {
     }
   };
 
-  const handleGoogleLogin = () => {
-    // In a real app, this would trigger Google OAuth
-    localStorage.setItem("isAuthenticated", "true");
-    router.push("/dashboard");
-  };
+    const handleGoogleLogin = () => {
+      // In a real app, this would trigger Google OAuth
+      localStorage.setItem("isAuthenticated", "true");
+      router.push("/dashboard");
+    };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-4">

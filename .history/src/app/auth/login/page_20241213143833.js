@@ -44,9 +44,7 @@ const LoginPage = () => {
         credentials: "include",
       });
 
-
-      console.log("Response", response.body.locked.valueOf());
-      const data = await response.body.json();
+      const data = await response.json();
 
       if (!response.ok) {
         throw new Error(data.message || "Login failed");

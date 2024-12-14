@@ -45,7 +45,7 @@ const LoginPage = () => {
       });
 
 
-      console.log("Response", response.body.locked.valueOf());
+      console.log("Response", response.body.json());
       const data = await response.body.json();
 
       if (!response.ok) {

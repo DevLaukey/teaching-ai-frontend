@@ -44,19 +44,15 @@ const LoginPage = () => {
         credentials: "include",
       });
 
-
-      console.log("Response", response.body.locked.valueOf());
-      const data = await response.body.json();
+      const data = await response.json();
 
       if (!response.ok) {
         throw new Error(data.message || "Login failed");
       }
 
-      console.log(data);
-
       // Store the token if your backend sends one
-      if (data.auth_token) {
-        localStorage.setItem("token", data.auth_token);
+      if (data.token) {
+        localStorage.setItem("token", data.token);
       }
 
       // Store any user data
