@@ -44,9 +44,8 @@ const LoginPage = () => {
       });
 
 
+      console.log("Response", await response.json());
       const data = await response.json();
-
- 
 
       if (!response.ok) {
         throw new Error(data.non_field_errors || "Login failed");

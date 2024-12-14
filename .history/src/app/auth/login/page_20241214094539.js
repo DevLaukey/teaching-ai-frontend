@@ -31,7 +31,7 @@ const LoginPage = () => {
     try {
       console.log("Login Credentials", email);
       console.log("Password: " + password);
-      const response = await fetch(`${backendUrl}auth/token/login/`, {
+      const response = await fetch(`${backendUrl}auth/token/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -44,9 +44,8 @@ const LoginPage = () => {
       });
 
 
+      console.log("Response", await response.json());
       const data = await response.json();
-
- 
 
       if (!response.ok) {
         throw new Error(data.non_field_errors || "Login failed");
@@ -56,7 +55,6 @@ const LoginPage = () => {
 
       // Store the token if your backend sends one
       if (data.auth_token) {
-        console.log(data.auth_token);
         localStorage.setItem("token", data.auth_token);
       }
 
