@@ -37,7 +37,6 @@ import {
 const CourseView = () => {
   const param = useParams();
   const { id } = param;
-  const router = useRouter();
 
   // Mock course data - in a real app, fetch this based on the id
   const course = {
@@ -94,7 +93,11 @@ const CourseView = () => {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="icon" onClick={() => router.back()}>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => router.push("/courses")}
+              >
                 <ArrowLeft className="h-5 w-5" />
               </Button>
               <div>

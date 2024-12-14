@@ -168,7 +168,7 @@ const MyCourses = () => {
   const handleDeleteCourses = () => {
 
     //TODO: this
-    // make an API call here
+    // In a real app, you'd make an API call here
     const remainingCourses = courses.filter(
       (course) => !selectedCourses.includes(course.id)
     );

@@ -37,7 +37,6 @@ import {
 const CourseView = () => {
   const param = useParams();
   const { id } = param;
-  const router = useRouter();
 
   // Mock course data - in a real app, fetch this based on the id
   const course = {

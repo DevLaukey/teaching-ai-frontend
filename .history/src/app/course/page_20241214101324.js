@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -60,14 +60,11 @@ const MyCourses = () => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `
-        Token ${localStorage.getItem("token")}`,
+        "Authorization": `Bearer ${localStorage.getItem("token")}`,
       },
       mode: "cors"
     });
     const data = await response.json();
-
-    console.log("courses data ",data);
     return data;
   }
 
@@ -166,9 +163,7 @@ const MyCourses = () => {
   };
 
   const handleDeleteCourses = () => {
-
-    //TODO: this
-    // make an API call here
+    // In a real app, you'd make an API call here
     const remainingCourses = courses.filter(
       (course) => !selectedCourses.includes(course.id)
     );
@@ -342,7 +337,7 @@ const MyCourses = () => {
                       <DropdownMenuItem
                         onClick={(e) => {
                           e.stopPropagation();
-                          router.push(`/course/${course.id}/edit`);
+                          router.push(`/courses/${course.id}/edit`);
                         }}
                       >
                         <Edit className="h-4 w-4 mr-2" />

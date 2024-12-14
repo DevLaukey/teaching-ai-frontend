@@ -166,9 +166,7 @@ const MyCourses = () => {
   };
 
   const handleDeleteCourses = () => {
-
-    //TODO: this
-    // make an API call here
+    // In a real app, you'd make an API call here
     const remainingCourses = courses.filter(
       (course) => !selectedCourses.includes(course.id)
     );
@@ -342,7 +340,7 @@ const MyCourses = () => {
                       <DropdownMenuItem
                         onClick={(e) => {
                           e.stopPropagation();
-                          router.push(`/course/${course.id}/edit`);
+                          router.push(`/courses/${course.id}/edit`);
                         }}
                       >
                         <Edit className="h-4 w-4 mr-2" />

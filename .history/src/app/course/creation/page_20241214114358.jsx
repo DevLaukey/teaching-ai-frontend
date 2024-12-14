@@ -16,12 +16,10 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft, Upload, Eye, Save, BookOpen, Wand2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-
-
+import { useHistory } from "react-router-dom";
 const CourseCreation = () => {
   const [contentType, setContentType] = useState("powerpoint");
-  const router = useRouter();
+  const history = useHistory();
   const subjects = [
     "Mathematics",
     "English",
@@ -46,7 +44,7 @@ const CourseCreation = () => {
       <header className="bg-white border-b">
         <div className="max-w-5xl mx-auto px-6 py-4">
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="icon" onClick={() => router.back()}>
+            <Button variant="ghost" size="icon" onClick={() => history.back()}>
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>

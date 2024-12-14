@@ -46,7 +46,7 @@ const CourseCreation = () => {
       <header className="bg-white border-b">
         <div className="max-w-5xl mx-auto px-6 py-4">
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="icon" onClick={() => router.back()}>
+            <Button variant="ghost" size="icon" onClick={() => history.back()}>
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
