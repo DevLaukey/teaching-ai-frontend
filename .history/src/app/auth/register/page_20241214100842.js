@@ -121,8 +121,10 @@ const RegisterPage = () => {
 
         const data = await response.json();
 
+
+        console.log(data);
         if (!response.ok) {
-          throw new Error(data.email || "Registration failed");
+          throw new Error(data || "Registration failed");
         }
 
         //make call to login endpoint

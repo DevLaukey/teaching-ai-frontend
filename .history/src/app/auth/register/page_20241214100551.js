@@ -103,26 +103,29 @@ const RegisterPage = () => {
 
     if (validateForm()) {
       try {
-        const response = await fetch(`${backendUrl}register/`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            email: formData.email,
-            password: formData.password,
-            role: formData.role,
-          }),
-          mode: "cors",
-          credentials: "include",
-        });
+        const response = await fetch(
+          "https://eduai-rsjn.onrender.com/register/",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              first_name: formData.firstName,
+              last_name: formData.lastName,
+              email: formData.email,
+              password: formData.password,
+              role: formData.role,
+            }),
+            mode: "cors",
+            credentials: "include",
+          }
+        );
 
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.email || "Registration failed");
+          throw new Error(data.message || "Registration failed");
         }
 
         //make call to login endpoint

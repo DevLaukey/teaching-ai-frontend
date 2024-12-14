@@ -36,7 +36,6 @@ const RegisterPage = () => {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState("");
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   const validateForm = () => {
     const newErrors = {};
@@ -103,49 +102,40 @@ const RegisterPage = () => {
 
     if (validateForm()) {
       try {
-        const response = await fetch(`${backendUrl}register/`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            email: formData.email,
-            password: formData.password,
-            role: formData.role,
-          }),
-          mode: "cors",
-          credentials: "include",
-        });
+        const response = await fetch(
+          "https://eduai-rsjn.onrender.com/register/",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              first_name: formData.firstName,
+              last_name: formData.lastName,
+              email: formData.email,
+              password: formData.password,
+              role: formData.role,
+            }),
+            mode: "cors",
+            credentials: "include",
+          }
+        );
 
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.email || "Registration failed");
+          throw new Error(data.message || "Registration failed");
         }
 
-        //make call to login endpoint
-        const loginResponse = await fetch(`${backendUrl}auth/token/login/`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: formData.email,
-            password: formData.password,
-          }),
-          mode: "cors",
-        });
-
-        if (!loginResponse.ok) {
-          throw new Error(data.non_field_errors || "Login failed");
-        }
-
+        console.log(data);
         // Store the token if your backend sends one
-        if (data.auth_token) {
-          console.log(data.auth_token);
-          localStorage.setItem("token", data.auth_token);
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+        }
+
+        // Store user data if needed
+        if (data.user) {
+          localStorage.setItem("user", JSON.stringify(data.user));
         }
 
         // Redirect to dashboard on success
