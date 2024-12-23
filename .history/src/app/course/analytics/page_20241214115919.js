@@ -84,11 +84,13 @@ const CourseAnalytics = () => {
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex justify-between items-start">
-            <div>
-           
+            <div className="flex items-center space-x-4">
+              <Button variant="ghost" size="icon" onClick={() => router.back()}>
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
               <h1 className="text-2xl font-bold">Course Analytics</h1>
-              <p className="text-gray-500">Introduction to Machine Learning</p>
             </div>
+              <p className="text-gray-500">Introduction to Machine Learning</p>
             <div className="flex items-center space-x-4">
               <Select defaultValue={timeRange} onValueChange={setTimeRange}>
                 <SelectTrigger className="w-[180px]">

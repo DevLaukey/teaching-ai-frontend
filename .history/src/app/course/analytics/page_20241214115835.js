@@ -84,8 +84,10 @@ const CourseAnalytics = () => {
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex justify-between items-start">
+            <Button variant="ghost" size="icon" onClick={() => router.back()}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
             <div>
-           
               <h1 className="text-2xl font-bold">Course Analytics</h1>
               <p className="text-gray-500">Introduction to Machine Learning</p>
             </div>

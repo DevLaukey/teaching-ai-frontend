@@ -191,7 +191,9 @@ const MyCourses = () => {
               </p>
             </div>
             <div className="flex items-center space-x-4">
-             
+              <Button variant="outline" size="icon">
+                <Bell className="h-5 w-5" />
+              </Button>
               <Button
                 variant="outline"
                 onClick={() => router.push("/course/analytics")}
