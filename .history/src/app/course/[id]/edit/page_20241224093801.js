@@ -1,42 +1,42 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useParams, useRouter } from "next/navigation";
+import {
+  ArrowLeft,
+  BarChart,
+  Book,
+  Edit,
+  Download,
+  Share2,
+  Users,
+  Star,
+  MessageSquare,
+  MoreVertical,
+  PlayCircle,
+  FileText,
+  Settings,
+  Clock,
+  Image as ImageIcon,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Save, ArrowLeft, Upload, X } from "lucide-react";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 
-// Define the form schema
-const formSchema = z.object({
-  subject: z.string().min(1, "Subject is required"),
-  title: z.string().min(1, "Title is required"),
-  description: z.string().min(1, "Description is required"),
-  content_type: z.string().min(1, "Content type is required"),
-  template: z.string().min(1, "Template is required"),
-  details: z.string().optional(),
-  media: z.any().optional(),
-});
 const EditCoursePage = () => {
   const param = useParams();
   const router = useRouter();
@@ -44,7 +44,8 @@ const EditCoursePage = () => {
   const { toast } = useToast();
   const [mediaPreview, setMediaPreview] = useState(null);
   const [existingMedia, setExistingMedia] = useState(null);
-const [mediaType, setMediaType] = useState(null);
+  const [mediaType, setMediaType] = useState(null);
+
   // Initialize form
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -128,41 +129,6 @@ const [mediaType, setMediaType] = useState(null);
     }
   };
 
-
-  const renderMediaPreview = () => {
-    if (mediaPreview) {
-      return mediaType === "image" ? (
-        <img
-          src={mediaPreview}
-          alt="Preview"
-          className="rounded-lg max-h-40 w-auto"
-        />
-      ) : (
-        <video
-          src={mediaPreview}
-          controls
-          className="rounded-lg max-h-40 w-auto"
-        />
-      );
-    } else if (existingMedia) {
-      return mediaType === "image" ? (
-        <img
-          src={existingMedia}
-          alt="Current media"
-          className="rounded-lg max-h-40 w-auto"
-        />
-      ) : (
-        <video
-          src={existingMedia}
-          controls
-          className="rounded-lg max-h-40 w-auto"
-        />
-      );
-    }
-    return null;
-  };
-
-
   const clearMedia = () => {
     form.setValue("media", null);
     setMediaPreview(null);
@@ -217,6 +183,39 @@ const [mediaType, setMediaType] = useState(null);
         variant: "destructive",
       });
     }
+  };
+
+  const renderMediaPreview = () => {
+    if (mediaPreview) {
+      return mediaType === "image" ? (
+        <img
+          src={mediaPreview}
+          alt="Preview"
+          className="rounded-lg max-h-40 w-auto"
+        />
+      ) : (
+        <video
+          src={mediaPreview}
+          controls
+          className="rounded-lg max-h-40 w-auto"
+        />
+      );
+    } else if (existingMedia) {
+      return mediaType === "image" ? (
+        <img
+          src={existingMedia}
+          alt="Current media"
+          className="rounded-lg max-h-40 w-auto"
+        />
+      ) : (
+        <video
+          src={existingMedia}
+          controls
+          className="rounded-lg max-h-40 w-auto"
+        />
+      );
+    }
+    return null;
   };
 
   return (

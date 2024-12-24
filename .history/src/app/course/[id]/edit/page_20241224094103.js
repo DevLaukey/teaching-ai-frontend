@@ -128,46 +128,10 @@ const [mediaType, setMediaType] = useState(null);
     }
   };
 
-
-  const renderMediaPreview = () => {
-    if (mediaPreview) {
-      return mediaType === "image" ? (
-        <img
-          src={mediaPreview}
-          alt="Preview"
-          className="rounded-lg max-h-40 w-auto"
-        />
-      ) : (
-        <video
-          src={mediaPreview}
-          controls
-          className="rounded-lg max-h-40 w-auto"
-        />
-      );
-    } else if (existingMedia) {
-      return mediaType === "image" ? (
-        <img
-          src={existingMedia}
-          alt="Current media"
-          className="rounded-lg max-h-40 w-auto"
-        />
-      ) : (
-        <video
-          src={existingMedia}
-          controls
-          className="rounded-lg max-h-40 w-auto"
-        />
-      );
-    }
-    return null;
-  };
-
-
   const clearMedia = () => {
     form.setValue("media", null);
     setMediaPreview(null);
     setExistingMedia(null);
-    setMediaType(null);
   };
 
   // Submit handler
@@ -290,7 +254,7 @@ const [mediaType, setMediaType] = useState(null);
                   )}
                 />
 
-                {/* Content Type */}
+               {/* Content Type */}
                 <FormField
                   control={form.control}
                   name="content_type"
@@ -399,7 +363,31 @@ const [mediaType, setMediaType] = useState(null);
                               >
                                 <X className="h-4 w-4" />
                               </Button>
-                              {renderMediaPreview()}
+                              {mediaPreview ? (
+                                field.value?.type?.startsWith("image/") ? (
+                                  <img
+                                    src={mediaPreview}
+                                    alt="Preview"
+                                    className="rounded-lg max-h-40 w-auto"
+                                  />
+                                ) : (
+                                  <video
+                                    src={mediaPreview}
+                                    controls
+                                    className="rounded-lg max-h-40 w-auto"
+                                  />
+                                )
+                              ) : (
+                                existingMedia && (
+                                  <div className="flex items-center space-x-2">
+                                    <img
+                                      src={existingMedia}
+                                      alt="Current media"
+                                      className="rounded-lg max-h-40 w-auto"
+                                    />
+                                  </div>
+                                )
+                              )}
                             </div>
                           )}
                         </div>

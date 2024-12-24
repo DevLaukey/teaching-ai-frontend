@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,7 +22,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Save, ArrowLeft, Upload, X } from "lucide-react";
+import { Loader2, Save, ArrowLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -44,7 +44,7 @@ const EditCoursePage = () => {
   const { toast } = useToast();
   const [mediaPreview, setMediaPreview] = useState(null);
   const [existingMedia, setExistingMedia] = useState(null);
-const [mediaType, setMediaType] = useState(null);
+
   // Initialize form
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -96,9 +96,6 @@ const [mediaType, setMediaType] = useState(null);
       // Set existing media if available
       if (data.media) {
         setExistingMedia(data.media);
-        // Determine media type from URL
-        const isVideo = data.media.toLowerCase().match(/\.(mp4|mov|webm)$/);
-        setMediaType(isVideo ? "video" : "image");
       }
     } catch (error) {
       console.error("Error fetching course:", error);
@@ -120,54 +117,17 @@ const [mediaType, setMediaType] = useState(null);
       // Update form field
       field.onChange(file);
 
-      // Create preview URL and set media type
+      // Create preview URL
       const previewUrl = URL.createObjectURL(file);
       setMediaPreview(previewUrl);
-      setMediaType(file.type.startsWith("image/") ? "image" : "video");
       setExistingMedia(null); // Clear existing media when new file is selected
     }
   };
-
-
-  const renderMediaPreview = () => {
-    if (mediaPreview) {
-      return mediaType === "image" ? (
-        <img
-          src={mediaPreview}
-          alt="Preview"
-          className="rounded-lg max-h-40 w-auto"
-        />
-      ) : (
-        <video
-          src={mediaPreview}
-          controls
-          className="rounded-lg max-h-40 w-auto"
-        />
-      );
-    } else if (existingMedia) {
-      return mediaType === "image" ? (
-        <img
-          src={existingMedia}
-          alt="Current media"
-          className="rounded-lg max-h-40 w-auto"
-        />
-      ) : (
-        <video
-          src={existingMedia}
-          controls
-          className="rounded-lg max-h-40 w-auto"
-        />
-      );
-    }
-    return null;
-  };
-
 
   const clearMedia = () => {
     form.setValue("media", null);
     setMediaPreview(null);
     setExistingMedia(null);
-    setMediaType(null);
   };
 
   // Submit handler
@@ -290,7 +250,7 @@ const [mediaType, setMediaType] = useState(null);
                   )}
                 />
 
-                {/* Content Type */}
+               {/* Content Type */}
                 <FormField
                   control={form.control}
                   name="content_type"
@@ -399,7 +359,31 @@ const [mediaType, setMediaType] = useState(null);
                               >
                                 <X className="h-4 w-4" />
                               </Button>
-                              {renderMediaPreview()}
+                              {mediaPreview ? (
+                                field.value?.type?.startsWith("image/") ? (
+                                  <img
+                                    src={mediaPreview}
+                                    alt="Preview"
+                                    className="rounded-lg max-h-40 w-auto"
+                                  />
+                                ) : (
+                                  <video
+                                    src={mediaPreview}
+                                    controls
+                                    className="rounded-lg max-h-40 w-auto"
+                                  />
+                                )
+                              ) : (
+                                existingMedia && (
+                                  <div className="flex items-center space-x-2">
+                                    <img
+                                      src={existingMedia}
+                                      alt="Current media"
+                                      className="rounded-lg max-h-40 w-auto"
+                                    />
+                                  </div>
+                                )
+                              )}
                             </div>
                           )}
                         </div>
