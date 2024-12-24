@@ -173,10 +173,6 @@ const MyCourses = () => {
        throw new Error("No authentication token found");
      }
 
-
-     if (!selectedCourses.length) {
-       throw new Error("No courses selected");
-     }
      console.log("Deleting courses:", selectedCourses);
      // Delete each selected course
      await Promise.all(

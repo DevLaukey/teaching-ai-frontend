@@ -74,6 +74,7 @@ const MyCourses = () => {
        },
      });
 
+     console.log(response.json());
      if (!response.ok) {
        throw new Error("Failed to fetch courses");
      }
@@ -173,10 +174,6 @@ const MyCourses = () => {
        throw new Error("No authentication token found");
      }
 
-
-     if (!selectedCourses.length) {
-       throw new Error("No courses selected");
-     }
      console.log("Deleting courses:", selectedCourses);
      // Delete each selected course
      await Promise.all(
@@ -197,6 +194,7 @@ const MyCourses = () => {
        })
      );
 
+     console.log(response);
 
      // Refresh the courses list
      fetchCourses();

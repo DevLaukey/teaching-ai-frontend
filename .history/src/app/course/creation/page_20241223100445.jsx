@@ -102,19 +102,10 @@ const CourseCreation = () => {
     setError("");
 
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setError("Please login to create a course");
-        return;
-      }
-
-      console.log("Creating course with data:", token);
-
       const response = await fetch("https://eduai-rsjn.onrender.com/courses/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Token ${token}`,
         },
         body: JSON.stringify(formData),
       });
@@ -124,7 +115,7 @@ const CourseCreation = () => {
       }
 
       const data = await response.json();
-      router.push("/course");
+      router.push("/courses"); // Redirect to courses page after successful creation
     } catch (err) {
       setError("Failed to create course. Please try again.");
       console.error("Error:", err);

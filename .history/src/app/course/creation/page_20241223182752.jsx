@@ -114,7 +114,7 @@ const CourseCreation = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Token ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
       });
@@ -124,7 +124,7 @@ const CourseCreation = () => {
       }
 
       const data = await response.json();
-      router.push("/course");
+      router.push("/courses"); // Redirect to courses page after successful creation
     } catch (err) {
       setError("Failed to create course. Please try again.");
       console.error("Error:", err);

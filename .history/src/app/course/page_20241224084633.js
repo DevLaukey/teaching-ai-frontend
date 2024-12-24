@@ -173,14 +173,10 @@ const MyCourses = () => {
        throw new Error("No authentication token found");
      }
 
-
-     if (!selectedCourses.length) {
-       throw new Error("No courses selected");
-     }
      console.log("Deleting courses:", selectedCourses);
      // Delete each selected course
      await Promise.all(
-       selectedCourses.map(async (courseId) => {
+       selecxtedCourses.map(async (courseId) => {
          const response = await fetch(
            `https://eduai-rsjn.onrender.com/courses/${courseId}/`,
            {
@@ -197,6 +193,7 @@ const MyCourses = () => {
        })
      );
 
+     console.log(response);
 
      // Refresh the courses list
      fetchCourses();

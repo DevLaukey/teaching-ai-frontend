@@ -173,11 +173,6 @@ const MyCourses = () => {
        throw new Error("No authentication token found");
      }
 
-
-     if (!selectedCourses.length) {
-       throw new Error("No courses selected");
-     }
-     console.log("Deleting courses:", selectedCourses);
      // Delete each selected course
      await Promise.all(
        selectedCourses.map(async (courseId) => {
@@ -196,7 +191,6 @@ const MyCourses = () => {
          }
        })
      );
-
 
      // Refresh the courses list
      fetchCourses();
@@ -428,7 +422,10 @@ const MyCourses = () => {
                          <Edit className="h-4 w-4 mr-2" />
                          Edit
                        </DropdownMenuItem>
-                     
+                       <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+                         <Share2 className="h-4 w-4 mr-2" />
+                         Share
+                       </DropdownMenuItem>
                        <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
                          <Download className="h-4 w-4 mr-2" />
                          Export
