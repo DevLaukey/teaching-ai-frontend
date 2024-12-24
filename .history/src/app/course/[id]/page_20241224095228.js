@@ -125,7 +125,10 @@ const CourseView = () => {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              
+              <Button variant="outline" className="space-x-2">
+                <Share2 className="h-4 w-4" />
+                <span>Share</span>
+              </Button>
               <Button
                 className="space-x-2"
                 onClick={() => router.push(`/course/${id}/edit`)}
@@ -221,21 +224,28 @@ const CourseView = () => {
 
           {/* Sidebar - 1/3 width */}
           <div className="space-y-6">
+            {/* Course Progress */}
             <Card>
               <CardHeader>
-                <CardTitle>Course Information</CardTitle>
+                <CardTitle>Course Progress</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div>
                     <div className="flex justify-between text-sm mb-2">
-                      <span>Template</span>
-                      <span className="capitalize">{courseData.template}</span>
+                      <span>Completion</span>
+                      <span>{course.stats.completionRate}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-blue-600 h-2 rounded-full"
+                        style={{ width: `${course.stats.completionRate}%` }}
+                      />
                     </div>
                   </div>
 
                   <div className="pt-4 space-y-2">
-                    {/* <Button className="w-full">Start Learning</Button> */}
+                    <Button className="w-full">Continue Learning</Button>
                     <Button variant="outline" className="w-full">
                       <Download className="mr-2 h-4 w-4" />
                       Download Materials
@@ -245,6 +255,7 @@ const CourseView = () => {
               </CardContent>
             </Card>
 
+            {/* Course Stats */}
             <Card>
               <CardHeader>
                 <CardTitle>Quick Stats</CardTitle>
@@ -252,22 +263,23 @@ const CourseView = () => {
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Created</span>
-                    <span className="font-medium">
-                      {new Date(courseData.created_at).toLocaleDateString()}
-                    </span>
+                    <span className="text-gray-600">Total Students</span>
+                    <span className="font-medium">{course.students}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Average Rating</span>
+                    <div className="flex items-center">
+                      <Star className="h-4 w-4 text-yellow-400 mr-1" />
+                      <span className="font-medium">{course.rating}</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Course Duration</span>
+                    <span className="font-medium">{course.duration}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Last Updated</span>
-                    <span className="font-medium">
-                      {new Date(courseData.updated_at).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Subject</span>
-                    <span className="font-medium capitalize">
-                      {courseData.subject}
-                    </span>
+                    <span className="font-medium">{course.lastUpdated}</span>
                   </div>
                 </div>
               </CardContent>

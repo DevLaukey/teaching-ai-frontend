@@ -125,7 +125,10 @@ const CourseView = () => {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              
+              <Button variant="outline" className="space-x-2">
+                <Share2 className="h-4 w-4" />
+                <span>Share</span>
+              </Button>
               <Button
                 className="space-x-2"
                 onClick={() => router.push(`/course/${id}/edit`)}

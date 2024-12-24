@@ -125,7 +125,10 @@ const CourseView = () => {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              
+              <Button variant="outline" className="space-x-2">
+                <Share2 className="h-4 w-4" />
+                <span>Share</span>
+              </Button>
               <Button
                 className="space-x-2"
                 onClick={() => router.push(`/course/${id}/edit`)}
@@ -235,7 +238,7 @@ const CourseView = () => {
                   </div>
 
                   <div className="pt-4 space-y-2">
-                    {/* <Button className="w-full">Start Learning</Button> */}
+                    <Button className="w-full">Start Learning</Button>
                     <Button variant="outline" className="w-full">
                       <Download className="mr-2 h-4 w-4" />
                       Download Materials

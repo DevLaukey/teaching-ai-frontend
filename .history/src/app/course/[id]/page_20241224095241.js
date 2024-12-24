@@ -125,7 +125,10 @@ const CourseView = () => {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              
+              <Button variant="outline" className="space-x-2">
+                <Share2 className="h-4 w-4" />
+                <span>Share</span>
+              </Button>
               <Button
                 className="space-x-2"
                 onClick={() => router.push(`/course/${id}/edit`)}
@@ -220,7 +223,7 @@ const CourseView = () => {
           </div>
 
           {/* Sidebar - 1/3 width */}
-          <div className="space-y-6">
+      <div className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle>Course Information</CardTitle>
@@ -235,7 +238,7 @@ const CourseView = () => {
                   </div>
 
                   <div className="pt-4 space-y-2">
-                    {/* <Button className="w-full">Start Learning</Button> */}
+                    <Button className="w-full">Start Learning</Button>
                     <Button variant="outline" className="w-full">
                       <Download className="mr-2 h-4 w-4" />
                       Download Materials
@@ -265,14 +268,15 @@ const CourseView = () => {
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Subject</span>
-                    <span className="font-medium capitalize">
-                      {courseData.subject}
-                    </span>
+                    <span className="font-medium capitalize">{courseData.subject}</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </div>
+        </div>
+      </div>
+    </div>
         </div>
       </div>
     </div>
