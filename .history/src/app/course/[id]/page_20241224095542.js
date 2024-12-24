@@ -155,7 +155,7 @@ const CourseView = () => {
       });
     }
   };
-
+  
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -201,6 +201,7 @@ const CourseView = () => {
               </div>
             </div>
             <div className="flex items-center space-x-2">
+              
               <Button
                 className="space-x-2"
                 onClick={() => router.push(`/course/${id}/edit`)}
@@ -311,11 +312,7 @@ const CourseView = () => {
 
                   <div className="pt-4 space-y-2">
                     {/* <Button className="w-full">Start Learning</Button> */}
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      onClick={handleDownload}
-                    >
+                    <Button variant="outline" className="w-full">
                       <Download className="mr-2 h-4 w-4" />
                       Download Materials
                     </Button>

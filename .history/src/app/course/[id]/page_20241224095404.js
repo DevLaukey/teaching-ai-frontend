@@ -80,82 +80,6 @@ const CourseView = () => {
     fetchCourseData();
   }, [id, toast]);
 
-
-  const handleDownload = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        toast({
-          title: "Error",
-          description: "Please login to download materials",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // First check if there are materials to download
-      if (!courseData.materials_url) {
-        toast({
-          title: "No Materials",
-          description:
-            "No downloadable materials are available for this course",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Start download process
-      const response = await fetch(courseData.materials_url, {
-        headers: {
-          Authorization: `Token ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to download materials");
-      }
-
-      // Get filename from Content-Disposition header or use default
-      const contentDisposition = response.headers.get("Content-Disposition");
-      let filename = "course-materials";
-      if (contentDisposition) {
-        const filenameMatch = contentDisposition.match(/filename="(.+)"/);
-        if (filenameMatch) {
-          filename = filenameMatch[1];
-        }
-      }
-
-      // Convert response to blob
-      const blob = await response.blob();
-
-      // Create download link
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = filename;
-
-      // Trigger download
-      document.body.appendChild(link);
-      link.click();
-
-      // Cleanup
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-
-      toast({
-        title: "Success",
-        description: "Download started successfully",
-      });
-    } catch (error) {
-      console.error("Download error:", error);
-      toast({
-        title: "Error",
-        description: "Failed to download materials. Please try again later.",
-        variant: "destructive",
-      });
-    }
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -201,6 +125,7 @@ const CourseView = () => {
               </div>
             </div>
             <div className="flex items-center space-x-2">
+              
               <Button
                 className="space-x-2"
                 onClick={() => router.push(`/course/${id}/edit`)}
@@ -311,11 +236,7 @@ const CourseView = () => {
 
                   <div className="pt-4 space-y-2">
                     {/* <Button className="w-full">Start Learning</Button> */}
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      onClick={handleDownload}
-                    >
+                    <Button variant="outline" className="w-full">
                       <Download className="mr-2 h-4 w-4" />
                       Download Materials
                     </Button>
