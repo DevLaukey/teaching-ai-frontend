@@ -111,7 +111,7 @@ const CourseView = () => {
               </Button>
               <Button
                 className="space-x-2"
-                onClick={() => router.push(`/course/${id}/edit`)}
+                onClick={() => router.push(`/courses/${id}/edit`)}
               >
                 <Edit className="h-4 w-4" />
                 <span>Edit Course</span>

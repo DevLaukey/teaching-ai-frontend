@@ -336,7 +336,7 @@ const CourseCreation = () => {
               disabled={loading}
             >
               <Wand2 className="h-4 w-4" />
-              <span>{loading ? "Creating..." : "Create Course"}</span>
+              <span>{loading ? "Creating..." : "Generate Course"}</span>
             </Button>
           </div>
         </div>

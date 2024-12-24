@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -35,7 +35,6 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useForm } from "react-hook-form";
 
 const CourseView = () => {
   const param = useParams();
@@ -110,10 +109,9 @@ const CourseView = () => {
     );
   }
 
-  const isVideo =
-    courseData.media?.toLowerCase().endsWith(".mp4") ||
-    courseData.media?.toLowerCase().endsWith(".mov") ||
-    courseData.media?.toLowerCase().endsWith(".webm");
+  const isVideo = courseData.media?.toLowerCase().endsWith('.mp4') || 
+                 courseData.media?.toLowerCase().endsWith('.mov') || 
+                 courseData.media?.toLowerCase().endsWith('.webm');
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -128,8 +126,7 @@ const CourseView = () => {
               <div>
                 <h1 className="text-2xl font-bold">{courseData.title}</h1>
                 <p className="text-sm text-gray-500">
-                  Last updated{" "}
-                  {new Date(courseData.updated_at).toLocaleDateString()}
+                  Last updated {new Date(courseData.updated_at).toLocaleDateString()}
                 </p>
               </div>
             </div>
@@ -161,13 +158,13 @@ const CourseView = () => {
                 <div className="aspect-video bg-gray-100 rounded-lg mb-6 flex items-center justify-center overflow-hidden">
                   {courseData.media ? (
                     isVideo ? (
-                      <video
+                      <video 
                         src={courseData.media}
                         controls
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <img
+                      <img 
                         src={courseData.media}
                         alt={courseData.title}
                         className="w-full h-full object-cover"
@@ -279,9 +276,7 @@ const CourseView = () => {
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Subject</span>
-                    <span className="font-medium capitalize">
-                      {courseData.subject}
-                    </span>
+                    <span className="font-medium capitalize">{courseData.subject}</span>
                   </div>
                 </div>
               </CardContent>

@@ -35,7 +35,6 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useForm } from "react-hook-form";
 
 const CourseView = () => {
   const param = useParams();
