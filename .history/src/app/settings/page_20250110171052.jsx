@@ -58,12 +58,12 @@ const SettingsProfile = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-8">
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid grid-cols-1 w-full max-w-2xl">
+          <TabsList className="grid grid-cols-5 w-full max-w-2xl">
             <TabsTrigger value="profile">Profile</TabsTrigger>
-            {/* <TabsTrigger value="notifications">Notifications</TabsTrigger>
+            <TabsTrigger value="notifications">Notifications</TabsTrigger>
             <TabsTrigger value="integrations">Integrations</TabsTrigger>
             <TabsTrigger value="accessibility">Accessibility</TabsTrigger>
-            <TabsTrigger value="subscription">Subscription</TabsTrigger> */}
+            <TabsTrigger value="subscription">Subscription</TabsTrigger>
           </TabsList>
 
           {/* Profile Tab */}
@@ -134,7 +134,7 @@ const SettingsProfile = () => {
 
             </div>
           </TabsContent>
-
+{/* 
           {/* Notifications Tab */}
           <TabsContent value="notifications">
             <Card>
@@ -306,7 +306,7 @@ const SettingsProfile = () => {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          </TabsContent> */}
         </Tabs>
       </div>
     </div>

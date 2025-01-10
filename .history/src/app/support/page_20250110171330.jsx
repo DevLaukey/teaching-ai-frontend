@@ -284,9 +284,9 @@ const HelpSupport = () => {
                   </div>
                 </div>
               </CardContent>
-              {/* <CardFooter>
+              <CardFooter>
                 <Button className="w-full">Submit Support Ticket</Button>
-              </CardFooter> */}
+              </CardFooter>
             </Card>
           </div>
         </div>

@@ -58,12 +58,12 @@ const SettingsProfile = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-8">
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid grid-cols-5 w-full max-w-2xl">
+          <TabsList className="grid grid-cols-1 w-full max-w-2xl">
             <TabsTrigger value="profile">Profile</TabsTrigger>
-            <TabsTrigger value="notifications">Notifications</TabsTrigger>
+            {/* <TabsTrigger value="notifications">Notifications</TabsTrigger>
             <TabsTrigger value="integrations">Integrations</TabsTrigger>
             <TabsTrigger value="accessibility">Accessibility</TabsTrigger>
-            <TabsTrigger value="subscription">Subscription</TabsTrigger>
+            <TabsTrigger value="subscription">Subscription</TabsTrigger> */}
           </TabsList>
 
           {/* Profile Tab */}
@@ -131,34 +131,7 @@ const SettingsProfile = () => {
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Security Settings</CardTitle>
-                  <CardDescription>
-                    Manage your account security
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">Two-Factor Authentication</p>
-                      <p className="text-sm text-gray-500">
-                        Add an extra layer of security
-                      </p>
-                    </div>
-                    <Switch />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">Login History</p>
-                      <p className="text-sm text-gray-500">
-                        View your recent login activity
-                      </p>
-                    </div>
-                    <Button variant="outline">View History</Button>
-                  </div>
-                </CardContent>
-              </Card>
+
             </div>
           </TabsContent>
 

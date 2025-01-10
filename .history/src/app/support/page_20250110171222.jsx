@@ -89,10 +89,10 @@ const HelpSupport = () => {
                 <h1 className="text-2xl font-bold">Help & Support</h1>
                 <p className="text-gray-500">Find answers and get assistance</p>
               </div>
-              <Button className="space-x-2">
+              {/* <Button className="space-x-2">
                 <MessageCircle className="h-4 w-4" />
                 <span>Start Live Chat</span>
-              </Button>
+              </Button> */}
             </div>
 
             {/* Search Bar */}
@@ -113,7 +113,7 @@ const HelpSupport = () => {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Quick Actions */}
-          <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-start space-x-4">
@@ -146,7 +146,7 @@ const HelpSupport = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            {/* <Card>
               <CardContent className="pt-6">
                 <div className="flex items-start space-x-4">
                   <div className="p-3 bg-green-100 rounded-lg">
@@ -160,7 +160,7 @@ const HelpSupport = () => {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
 
           {/* Left Column - FAQs and Guides */}
