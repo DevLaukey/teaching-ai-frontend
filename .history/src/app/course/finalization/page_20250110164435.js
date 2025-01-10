@@ -40,9 +40,12 @@ const CourseFinalization = () => {
     const router = useRouter();
   const [exportProgress] = useState(100);
 
-  const handleFinalizeCourse = () => { 
-    router.push(`/community/`);
-  }
+  const lmsPlatforms = [
+    { id: "moodle", name: "Moodle", icon: "🎓" },
+    { id: "classroom", name: "Google Classroom", icon: "📚" },
+    { id: "blackboard", name: "Blackboard", icon: "🖥️" },
+    { id: "canvas", name: "Canvas", icon: "🎨" },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -190,12 +193,61 @@ const CourseFinalization = () => {
             </CardContent>
           </Card>
 
+          {/* LMS Integration */}
+          <Card className="col-span-2">
+            <CardHeader>
+              <CardTitle>LMS Integration</CardTitle>
+              <CardDescription>
+                Export directly to your Learning Management System
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                {lmsPlatforms.map((platform) => (
+                  <Button
+                    key={platform.id}
+                    variant="outline"
+                    className="h-auto p-4 justify-start space-x-4"
+                  >
+                    <div className="text-2xl">{platform.icon}</div>
+                    <div className="flex-1">
+                      <div className="font-semibold">{platform.name}</div>
+                      <div className="text-sm text-gray-500">
+                        Connect & Export
+                      </div>
+                    </div>
+                    <ExternalLink className="h-4 w-4" />
+                  </Button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Community Sharing */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Community</CardTitle>
+              <CardDescription>Share with other educators</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center space-x-2">
+                  <Star className="h-5 w-5 text-yellow-500" />
+                  <div className="text-sm font-medium">Community Rating</div>
+                </div>
+                <div className="text-2xl font-bold">4.8</div>
+              </div>
+              <Button variant="outline" className="w-full">
+                Share with Community
+              </Button>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Footer Actions */}
         <div className="mt-8 flex justify-between items-center py-4 border-t">
           <Button variant="outline">Save as Draft</Button>
-          <Button onClick={handleFinalizeCourse} className="space-x-2">
+          <Button className="space-x-2">
             <Check className="h-4 w-4" />
             <span>Finalize Course</span>
           </Button>

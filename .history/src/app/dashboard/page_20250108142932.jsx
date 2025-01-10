@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,67 +26,71 @@ import {
   GraduationCap,
   Laptop,
   HelpCircle,
-  ChartAreaIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const Dashboard = () => {
   const router = useRouter();
 
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [recentCourses, setRecentCourses] = useState([]);
 
-  // Function to get recent courses
-  const getRecentCourses = (allCourses) => {
-    // Sort courses by createdAt date in descending order
-    const sorted = [...allCourses].sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-    );
+   const [courses, setCourses] = useState([]);
+   const [loading, setLoading] = useState(true);
+   const [error, setError] = useState(null);
+   const [recentCourses, setRecentCourses] = useState([]);
 
-    console.log(sorted);
-    // Get the 3 most recent courses
-    return sorted.slice(0, 3);
-  };
+   // Function to get recent courses
+   const getRecentCourses = (allCourses) => {
+     // Sort courses by createdAt date in descending order
+     const sorted = [...allCourses].sort(
+       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+     );
 
-  useEffect(() => {
-    fetchCourses();
-  }, []);
+     console.log(sorted);
+     // Get the 3 most recent courses
+     return sorted.slice(0, 3);
+   };
+
+   useEffect(() => {
+     fetchCourses();
+   }, []);
 
   const fetchCourses = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("No authentication token found");
-      }
+     console.log(`Fetching courses1...`);
+     try {
+       const token = localStorage.getItem("token");
+       if (!token) {
+         throw new Error("No authentication token found");
+       }
 
-      console.log("Fetching courses");
+       const response = await fetch(
+         "https://eduai-rsjn.onrender.com/courses/",
+         {
+           method: "GET",
+           headers: {
+             Authorization: `Token ${token}`,
+             "Content-Type": "application/json",
+           },
+         }
+       );
 
-      const response = await fetch("https://eduai-rsjn.onrender.com/courses/", {
-        method: "GET",
-        headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
 
-      console.log("Response",response);
-      if (!response.ok) {
-        throw new Error("Failed to fetch courses");
-      }
+       console.log(response)
+       if (!response.ok) {
+         throw new Error("Failed to fetch courses");
+       }
 
-      const data = await response.json();
-      setCourses(data);
-      setRecentCourses(getRecentCourses(data));
+       const data = await response.json();
+       setCourses(data);
+       setRecentCourses(getRecentCourses(data));
 
-      console.log("Success getting courses", data);
-      setLoading(false);
-    } catch (err) {
-      setError(err.message);
-      setLoading(false);
-    }
-  };
+
+       console.log("Success getting courses", data);
+       setLoading(false);
+     } catch (err) {
+       setError(err.message);
+       setLoading(false);
+     }
+   };
 
   // Mock data for recent activity
   const recentActivity = [
@@ -217,7 +221,7 @@ const Dashboard = () => {
           {/* Main Dashboard Content */}
           <main className="flex-1 space-y-6">
             {/* Quick Actions */}
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-1 gap-4">
               <Card>
                 <CardContent className="pt-6">
                   <Button
@@ -229,17 +233,7 @@ const Dashboard = () => {
                   </Button>
                 </CardContent>
               </Card>
-              <Card>
-                <CardContent className="pt-6">
-                  <Button
-                    className="w-full space-x-2"
-                    onClick={() => router.push("/course/analytics")}
-                  >
-                    <ChartAreaIcon className="h-4 w-4" />
-                    <span>View Analytics</span>
-                  </Button>
-                </CardContent>
-              </Card>
+              
             </div>
 
             {/* Statistics */}

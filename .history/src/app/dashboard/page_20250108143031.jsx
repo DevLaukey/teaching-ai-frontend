@@ -26,7 +26,6 @@ import {
   GraduationCap,
   Laptop,
   HelpCircle,
-  ChartAreaIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -56,12 +55,11 @@ const Dashboard = () => {
 
   const fetchCourses = async () => {
     try {
+      console.log(`Fetching courses1...`);
       const token = localStorage.getItem("token");
       if (!token) {
         throw new Error("No authentication token found");
       }
-
-      console.log("Fetching courses");
 
       const response = await fetch("https://eduai-rsjn.onrender.com/courses/", {
         method: "GET",
@@ -71,7 +69,7 @@ const Dashboard = () => {
         },
       });
 
-      console.log("Response",response);
+      console.log(response);
       if (!response.ok) {
         throw new Error("Failed to fetch courses");
       }
@@ -217,7 +215,7 @@ const Dashboard = () => {
           {/* Main Dashboard Content */}
           <main className="flex-1 space-y-6">
             {/* Quick Actions */}
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-1 gap-4">
               <Card>
                 <CardContent className="pt-6">
                   <Button
@@ -226,17 +224,6 @@ const Dashboard = () => {
                   >
                     <Plus className="h-4 w-4" />
                     <span>Create New Course</span>
-                  </Button>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="pt-6">
-                  <Button
-                    className="w-full space-x-2"
-                    onClick={() => router.push("/course/analytics")}
-                  >
-                    <ChartAreaIcon className="h-4 w-4" />
-                    <span>View Analytics</span>
                   </Button>
                 </CardContent>
               </Card>

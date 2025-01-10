@@ -227,7 +227,7 @@ const CourseAnalytics = () => {
                     <Tooltip />
                   </PieChart>
                 </ResponsiveContainer>
-                <div className="flex justify-center space-x-4 -mt-6">
+                <div className="flex justify-center space-x-4 mt-4">
                   {feedbackData.map((item) => (
                     <div key={item.name} className="flex items-center">
                       <div

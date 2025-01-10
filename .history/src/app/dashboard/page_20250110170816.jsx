@@ -26,7 +26,6 @@ import {
   GraduationCap,
   Laptop,
   HelpCircle,
-  ChartAreaIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -217,8 +216,8 @@ const Dashboard = () => {
           {/* Main Dashboard Content */}
           <main className="flex-1 space-y-6">
             {/* Quick Actions */}
-            <div className="grid md:grid-cols-2 gap-4">
-              <Card>
+            <div className="grid md:grid-cols-1 gap-4">
+              <Card className="flex w-full flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
                 <CardContent className="pt-6">
                   <Button
                     className="w-full space-x-2"
@@ -228,15 +227,13 @@ const Dashboard = () => {
                     <span>Create New Course</span>
                   </Button>
                 </CardContent>
-              </Card>
-              <Card>
                 <CardContent className="pt-6">
                   <Button
                     className="w-full space-x-2"
-                    onClick={() => router.push("/course/analytics")}
+                    onClick={() => router.push("/course/creation")}
                   >
-                    <ChartAreaIcon className="h-4 w-4" />
-                    <span>View Analytics</span>
+                    <Plus className="h-4 w-4" />
+                    <span>Create New Course</span>
                   </Button>
                 </CardContent>
               </Card>

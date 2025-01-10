@@ -149,7 +149,25 @@ const CourseAnalytics = () => {
             </CardContent>
           </Card>
 
-         
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">
+                    Avg. Quiz Score
+                  </p>
+                  <h3 className="text-2xl font-bold mt-2">82%</h3>
+                  <p className="text-sm text-red-600 flex items-center mt-1">
+                    <ArrowDown className="h-4 w-4 mr-1" />
+                    3% vs last week
+                  </p>
+                </div>
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <BookOpen className="h-6 w-6 text-purple-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           <Card>
             <CardContent className="pt-6">
@@ -227,7 +245,7 @@ const CourseAnalytics = () => {
                     <Tooltip />
                   </PieChart>
                 </ResponsiveContainer>
-                <div className="flex justify-center space-x-4 -mt-6">
+                <div className="flex justify-center space-x-4 mt-4">
                   {feedbackData.map((item) => (
                     <div key={item.name} className="flex items-center">
                       <div
@@ -244,9 +262,29 @@ const CourseAnalytics = () => {
             </CardContent>
           </Card>
 
-        
+          {/* Quiz Performance */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Quiz Performance</CardTitle>
+              <CardDescription>Average scores by quiz</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={quizScores}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="score" fill="#2563eb" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Improvement Suggestions */}
-          <Card className="lg:col-span-3">
+          <Card className="lg:col-span-2">
             <CardHeader>
               <CardTitle>Suggested Improvements</CardTitle>
               <CardDescription>

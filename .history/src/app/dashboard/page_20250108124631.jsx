@@ -1,5 +1,5 @@
-"use client";
-import React, { useEffect, useState } from "react";
+"use client"
+import React, {useState, useEffect} from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -26,29 +26,14 @@ import {
   GraduationCap,
   Laptop,
   HelpCircle,
-  ChartAreaIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const Dashboard = () => {
   const router = useRouter();
-
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [recentCourses, setRecentCourses] = useState([]);
-
-  // Function to get recent courses
-  const getRecentCourses = (allCourses) => {
-    // Sort courses by createdAt date in descending order
-    const sorted = [...allCourses].sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-    );
-
-    console.log(sorted);
-    // Get the 3 most recent courses
-    return sorted.slice(0, 3);
-  };
 
   useEffect(() => {
     fetchCourses();
@@ -61,8 +46,6 @@ const Dashboard = () => {
         throw new Error("No authentication token found");
       }
 
-      console.log("Fetching courses");
-
       const response = await fetch("https://eduai-rsjn.onrender.com/courses/", {
         method: "GET",
         headers: {
@@ -71,16 +54,12 @@ const Dashboard = () => {
         },
       });
 
-      console.log("Response",response);
       if (!response.ok) {
         throw new Error("Failed to fetch courses");
       }
 
       const data = await response.json();
       setCourses(data);
-      setRecentCourses(getRecentCourses(data));
-
-      console.log("Success getting courses", data);
       setLoading(false);
     } catch (err) {
       setError(err.message);
@@ -88,30 +67,35 @@ const Dashboard = () => {
     }
   };
 
-  // Mock data for recent activity
-  const recentActivity = [
-    {
-      id: 1,
-      type: "edit",
-      course: "Introduction to Machine Learning",
-      time: "2 hours ago",
-    },
-    {
-      id: 2,
-      type: "create",
-      course: "Advanced Mathematics",
-      time: "5 days ago",
-    },
-    {
-      id: 3,
-      type: "share",
-      course: "Basic Programming Concepts",
-      time: "1 week ago",
-    },
-  ];
+  const handleCreateCourse = async (courseData) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const response = await fetch("https://eduai-rsjn.onrender.com/courses/", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(courseData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create course");
+      }
+
+      // Refresh courses list after creation
+      fetchCourses();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   const handleLogout = () => {
-    localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("token");
     localStorage.removeItem("userProfile");
     router.push("/auth/login");
   };
@@ -119,6 +103,22 @@ const Dashboard = () => {
   const handleCourseClick = (courseId) => {
     router.push(`/course/${courseId}`);
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        Loading...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen text-red-600">
+        Error: {error}
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -217,7 +217,7 @@ const Dashboard = () => {
           {/* Main Dashboard Content */}
           <main className="flex-1 space-y-6">
             {/* Quick Actions */}
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-1 gap-4">
               <Card>
                 <CardContent className="pt-6">
                   <Button
@@ -226,17 +226,6 @@ const Dashboard = () => {
                   >
                     <Plus className="h-4 w-4" />
                     <span>Create New Course</span>
-                  </Button>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="pt-6">
-                  <Button
-                    className="w-full space-x-2"
-                    onClick={() => router.push("/course/analytics")}
-                  >
-                    <ChartAreaIcon className="h-4 w-4" />
-                    <span>View Analytics</span>
                   </Button>
                 </CardContent>
               </Card>

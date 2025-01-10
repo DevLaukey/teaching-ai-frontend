@@ -233,7 +233,7 @@ const Dashboard = () => {
                 <CardContent className="pt-6">
                   <Button
                     className="w-full space-x-2"
-                    onClick={() => router.push("/course/analytics")}
+                    onClick={() => router.push("/course/creation")}
                   >
                     <ChartAreaIcon className="h-4 w-4" />
                     <span>View Analytics</span>

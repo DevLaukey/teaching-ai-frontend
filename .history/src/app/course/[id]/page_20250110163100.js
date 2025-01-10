@@ -65,6 +65,7 @@ const CourseView = () => {
 
         const data = await response.json();
 
+        console.log(data);
         setCourseData(data);
       } catch (error) {
         console.error("Error fetching course:", error);

@@ -40,9 +40,12 @@ const CourseFinalization = () => {
     const router = useRouter();
   const [exportProgress] = useState(100);
 
-  const handleFinalizeCourse = () => { 
-    router.push(`/community/`);
-  }
+  const lmsPlatforms = [
+    { id: "moodle", name: "Moodle", icon: "🎓" },
+    { id: "classroom", name: "Google Classroom", icon: "📚" },
+    { id: "blackboard", name: "Blackboard", icon: "🖥️" },
+    { id: "canvas", name: "Canvas", icon: "🎨" },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -195,7 +198,7 @@ const CourseFinalization = () => {
         {/* Footer Actions */}
         <div className="mt-8 flex justify-between items-center py-4 border-t">
           <Button variant="outline">Save as Draft</Button>
-          <Button onClick={handleFinalizeCourse} className="space-x-2">
+          <Button className="space-x-2">
             <Check className="h-4 w-4" />
             <span>Finalize Course</span>
           </Button>
