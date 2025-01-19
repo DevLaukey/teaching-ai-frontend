@@ -147,9 +147,7 @@ const CourseCreation = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // const id = response.body.id ;
-      const id = 3
-      
+      const id = response.body.id;
       router.push(`/course/content-preview/${id}`);
     } catch (err) {
       setError("Failed to create course. Please try again.");
