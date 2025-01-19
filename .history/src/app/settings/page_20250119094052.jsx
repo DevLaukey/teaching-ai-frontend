@@ -47,8 +47,11 @@ const SettingsProfile = () => {
             },
           }
         );
+        
+        const data = await response.json();
 
-    
+
+        console.log("asd", data);
 
         if (response.ok) {
           const data = await response.json();
@@ -112,7 +115,6 @@ const SettingsProfile = () => {
         }
       );
 
-      console.log("casd", response);
       if (response.ok) {
         toast({
           title: "Success",

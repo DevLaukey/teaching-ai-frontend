@@ -48,7 +48,8 @@ const SettingsProfile = () => {
           }
         );
 
-    
+        const data = await response.json();
+        console.log("data", data);
 
         if (response.ok) {
           const data = await response.json();

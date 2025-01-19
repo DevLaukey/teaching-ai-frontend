@@ -47,7 +47,7 @@ const Navigation = () => {
 
   const navigationLinks = [
     { href: "/dashboard", icon: BarChart, label: "Dashboard" },
-    { href: "/courses", icon: Book, label: "My Courses" },
+    { href: "/course", icon: Book, label: "My Courses" },
     { href: "/settings", icon: Settings, label: "Settings" },
     { href: "/support", icon: HelpCircle, label: "Support" },
   ];
@@ -127,10 +127,7 @@ const Navigation = () => {
                   <User className="mr-2 h-4 w-4" />
                   <span>Profile</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push("/settings")}>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
-                </DropdownMenuItem>
+               
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="text-red-600"

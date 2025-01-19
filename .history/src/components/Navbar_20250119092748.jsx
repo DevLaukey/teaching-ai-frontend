@@ -21,7 +21,7 @@ import {
   User,
   HelpCircle,
 } from "lucide-react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 const Navigation = () => {
@@ -47,7 +47,7 @@ const Navigation = () => {
 
   const navigationLinks = [
     { href: "/dashboard", icon: BarChart, label: "Dashboard" },
-    { href: "/courses", icon: Book, label: "My Courses" },
+    { href: "/course", icon: Book, label: "My Courses" },
     { href: "/settings", icon: Settings, label: "Settings" },
     { href: "/support", icon: HelpCircle, label: "Support" },
   ];
@@ -123,10 +123,7 @@ const Navigation = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem onClick={() => router.push("/settings")}>
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Profile</span>
-                </DropdownMenuItem>
+               
                 <DropdownMenuItem onClick={() => router.push("/settings")}>
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Settings</span>

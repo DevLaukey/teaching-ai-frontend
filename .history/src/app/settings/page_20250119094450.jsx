@@ -101,7 +101,7 @@ const SettingsProfile = () => {
       }
 
       const response = await fetch(
-        "https://eduai-rsjn.onrender.com/auth/users/me/",
+        "https://eduai-rsjn.onrender.com/auth/users/",
         {
           method: "PATCH",
           headers: {

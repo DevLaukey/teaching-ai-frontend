@@ -48,7 +48,8 @@ const SettingsProfile = () => {
           }
         );
 
-    
+        const data = await response.json();
+        console.log("data", data);
 
         if (response.ok) {
           const data = await response.json();
@@ -101,7 +102,7 @@ const SettingsProfile = () => {
       }
 
       const response = await fetch(
-        "https://eduai-rsjn.onrender.com/auth/users/me/",
+        "https://eduai-rsjn.onrender.com/auth/users/",
         {
           method: "PATCH",
           headers: {

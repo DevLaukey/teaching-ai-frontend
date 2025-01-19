@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,16 +14,18 @@ import {
   Bell,
   Book,
   GraduationCap,
-  Layout,
+  BarChart,
   LogOut,
   Menu,
-  MessageSquare,
   Settings,
   User,
-  Users,
+  HelpCircle,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const Navigation = () => {
+  const router = useRouter();
   const [notifications] = useState([
     {
       id: 1,
@@ -36,48 +39,50 @@ const Navigation = () => {
     },
   ]);
 
+  const handleLogout = () => {
+    localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("userProfile");
+    router.push("/auth/login");
+  };
+
+  const navigationLinks = [
+    { href: "/dashboard", icon: BarChart, label: "Dashboard" },
+    { href: "/course", icon: Book, label: "My Courses" },
+    { href: "/settings", icon: Settings, label: "Settings" },
+    { href: "/support", icon: HelpCircle, label: "Support" },
+  ];
+
   return (
     <nav className="border-b bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex justify-between items-center h-16">
           {/* Logo and Brand */}
-          <div className="flex items-center">
+          <Link href="/dashboard" className="flex items-center cursor-pointer">
             <GraduationCap className="h-8 w-8 text-blue-600" />
             <span className="ml-2 text-xl font-bold">EduAI</span>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <a
-              href="/dashboard"
-              className="text-gray-600 hover:text-blue-600 flex items-center space-x-1"
-            >
-              <Layout className="h-4 w-4" />
-              <span>Dashboard</span>
-            </a>
-            <a
-              href="/courses"
-              className="text-gray-600 hover:text-blue-600 flex items-center space-x-1"
-            >
-              <Book className="h-4 w-4" />
-              <span>My Courses</span>
-            </a>
-            <a
-              href="/community"
-              className="text-gray-600 hover:text-blue-600 flex items-center space-x-1"
-            >
-              <Users className="h-4 w-4" />
-              <span>Community</span>
-            </a>
+            {navigationLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`text-gray-600 hover:text-blue-600 flex items-center space-x-1 ${
+                    router.pathname === link.href ? "text-blue-600" : ""
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span>{link.label}</span>
+                </Link>
+              );
+            })}
           </div>
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-4">
-            {/* Messages */}
-            <Button variant="ghost" size="icon" className="hidden md:flex">
-              <MessageSquare className="h-5 w-5" />
-            </Button>
-
             {/* Notifications */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -118,16 +123,19 @@ const Navigation = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem className="flex items-center">
+                <DropdownMenuItem onClick={() => router.push("/settings")}>
                   <User className="mr-2 h-4 w-4" />
                   <span>Profile</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="flex items-center">
+                {/* <DropdownMenuItem onClick={() => router.push("/settings")}>
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Settings</span>
-                </DropdownMenuItem>
+                </DropdownMenuItem> */}
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="flex items-center text-red-600">
+                <DropdownMenuItem
+                  className="text-red-600"
+                  onClick={handleLogout}
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>
                 </DropdownMenuItem>
@@ -143,41 +151,21 @@ const Navigation = () => {
               </SheetTrigger>
               <SheetContent>
                 <div className="flex flex-col space-y-4 mt-4">
-                  <a
-                    href="/dashboard"
-                    className="flex items-center space-x-2 text-lg"
-                  >
-                    <Layout className="h-5 w-5" />
-                    <span>Dashboard</span>
-                  </a>
-                  <a
-                    href="/courses"
-                    className="flex items-center space-x-2 text-lg"
-                  >
-                    <Book className="h-5 w-5" />
-                    <span>My Courses</span>
-                  </a>
-                  <a
-                    href="/community"
-                    className="flex items-center space-x-2 text-lg"
-                  >
-                    <Users className="h-5 w-5" />
-                    <span>Community</span>
-                  </a>
-                  <a
-                    href="/messages"
-                    className="flex items-center space-x-2 text-lg"
-                  >
-                    <MessageSquare className="h-5 w-5" />
-                    <span>Messages</span>
-                  </a>
-                  <a
-                    href="/profile"
-                    className="flex items-center space-x-2 text-lg"
-                  >
-                    <User className="h-5 w-5" />
-                    <span>Profile</span>
-                  </a>
+                  {navigationLinks.map((link) => {
+                    const Icon = link.icon;
+                    return (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className={`flex items-center space-x-2 text-lg ${
+                          router.pathname === link.href ? "text-blue-600" : ""
+                        }`}
+                      >
+                        <Icon className="h-5 w-5" />
+                        <span>{link.label}</span>
+                      </Link>
+                    );
+                  })}
                 </div>
               </SheetContent>
             </Sheet>

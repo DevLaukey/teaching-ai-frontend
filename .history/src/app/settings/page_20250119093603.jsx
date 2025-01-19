@@ -11,11 +11,10 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Upload, Eye, EyeOff, Check } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 const SettingsProfile = () => {
   const { toast } = useToast();
-
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userDetails, setUserDetails] = useState({
@@ -47,8 +46,6 @@ const SettingsProfile = () => {
             },
           }
         );
-
-    
 
         if (response.ok) {
           const data = await response.json();
@@ -112,7 +109,6 @@ const SettingsProfile = () => {
         }
       );
 
-      console.log("casd", response);
       if (response.ok) {
         toast({
           title: "Success",

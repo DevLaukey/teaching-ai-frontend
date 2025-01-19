@@ -14,7 +14,7 @@ import { Upload, Eye, EyeOff, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const SettingsProfile = () => {
-  const { toast } = useToast();
+    const { toast } = useToast();
 
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -48,7 +48,8 @@ const SettingsProfile = () => {
           }
         );
 
-    
+        console.log(
+          "asd",response);
 
         if (response.ok) {
           const data = await response.json();
@@ -112,7 +113,6 @@ const SettingsProfile = () => {
         }
       );
 
-      console.log("casd", response);
       if (response.ok) {
         toast({
           title: "Success",
