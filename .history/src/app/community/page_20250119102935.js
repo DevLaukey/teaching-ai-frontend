@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import {
   Card,
   CardContent,
@@ -82,7 +82,7 @@ const CommunitySharing = () => {
       });
 
       const response = await fetch(
-        `https://eduai-rsjn.onrender.com/courses`,
+        `https://eduai-rsjn.onrender.com/courses/community/?${queryParams}`,
         {
           headers: {
             Authorization: `Token ${token}`,
