@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Wand2 } from "lucide-react";
+import { ArrowLeft, Wand2, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
@@ -22,6 +22,7 @@ const CourseCreation = () => {
   const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [mediaPreview, setMediaPreview] = useState(null);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -31,6 +32,7 @@ const CourseCreation = () => {
     content_type: "powerpoint",
     template: "",
     details: "",
+    media: null,
   });
 
   // Validation state
@@ -41,6 +43,7 @@ const CourseCreation = () => {
     content_type: true,
     template: true,
     details: true,
+    media: true,
   });
 
   const subjects = [
@@ -65,6 +68,8 @@ const CourseCreation = () => {
       case "content_type":
       case "template":
         return value.length >= 1 && value.length <= 100;
+      case "media":
+        return true; // Media is optional, so always valid
       default:
         return true;
     }
@@ -79,6 +84,18 @@ const CourseCreation = () => {
       ...prev,
       [name]: validateField(name, value),
     }));
+  };
+
+  const handleMediaChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Update form data with file
+      handleChange("media", file);
+
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setMediaPreview(previewUrl);
+    }
   };
 
   const handleSubmit = async () => {
@@ -108,23 +125,32 @@ const CourseCreation = () => {
         return;
       }
 
-      console.log("Creating course with data:", token);
+      // Create FormData for multipart/form-data submission
+      const submitData = new FormData();
+      Object.keys(formData).forEach((key) => {
+        if (key === "media" && formData[key]) {
+          submitData.append("media", formData[key]);
+        } else if (formData[key]) {
+          submitData.append(key, formData[key]);
+        }
+      });
 
       const response = await fetch("https://eduai-rsjn.onrender.com/courses/", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Token ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: submitData,
       });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
-      router.push("/course"); // Redirect to courses page after successful creation
+      // const id = response.body.id ;
+      const id = 3
+      
+      router.push(`/course/content-preview/${id}`);
     } catch (err) {
       setError("Failed to create course. Please try again.");
       console.error("Error:", err);
@@ -208,6 +234,43 @@ const CourseCreation = () => {
                   onChange={(e) => handleChange("description", e.target.value)}
                 />
               </div>
+
+              <div className="space-y-4">
+                <Label>Course Media (Optional)</Label>
+                <div className="flex flex-col items-center p-6 border-2 border-dashed rounded-lg border-gray-300 hover:border-gray-400 transition-colors">
+                  <Upload className="h-8 w-8 mb-4 text-gray-400" />
+                  <input
+                    type="file"
+                    accept="image/*,video/*"
+                    onChange={handleMediaChange}
+                    className="hidden"
+                    id="media-upload"
+                  />
+                  <Label
+                    htmlFor="media-upload"
+                    className="cursor-pointer text-sm text-gray-600 hover:text-gray-800"
+                  >
+                    Click to upload image or video
+                  </Label>
+                  {mediaPreview && (
+                    <div className="mt-4 max-w-xs">
+                      {formData.media?.type?.startsWith("image/") ? (
+                        <img
+                          src={mediaPreview}
+                          alt="Preview"
+                          className="rounded-lg max-h-40 w-auto"
+                        />
+                      ) : (
+                        <video
+                          src={mediaPreview}
+                          controls
+                          className="rounded-lg max-h-40 w-auto"
+                        />
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
             </CardContent>
           </Card>
 
@@ -276,7 +339,7 @@ const CourseCreation = () => {
               disabled={loading}
             >
               <Wand2 className="h-4 w-4" />
-              <span>{loading ? "Creating..." : "Generate Course"}</span>
+              <span>{loading ? "Creating..." : "Create Course"}</span>
             </Button>
           </div>
         </div>
