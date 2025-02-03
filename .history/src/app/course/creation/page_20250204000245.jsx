@@ -144,7 +144,7 @@ const onSubmit = async (values) => {
           "Content-Type": "application/json",
           Authorization: `Token ${token}`,
         },
-        body: submitData,
+        body: JSON.stringify(submitData),
       }
     );
 

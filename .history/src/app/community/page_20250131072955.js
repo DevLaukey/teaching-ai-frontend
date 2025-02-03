@@ -1,5 +1,3 @@
-"use client"
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -114,14 +112,7 @@ const CommunitySharing = () => {
     return () => clearTimeout(debounceTimer);
   }, [searchQuery, selectedSubject, selectedTemplate, sortBy, currentPage]);
 
-  const togglePublished = async (courseId) => {
-    // Optimistically update local state
-    setCourses((prevCourses) =>
-      prevCourses.map((course) =>
-        course.id === courseId ? { ...course, is_published: true } : course
-      )
-    );
-
+  const togglePublished = async (courseId, currentStatus) => {
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No authentication token");
@@ -135,16 +126,27 @@ const CommunitySharing = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            is_published: true,
+            is_published: !currentStatus,
           }),
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to update status");
-        // If the API call fails, we could revert the optimistic update here
-        setCourses((prevCourses) => [...prevCourses]);
-      }
+      if (!response.ok) throw new Error("Failed to update status");
+
+      setCourses((prevCourses) =>
+        prevCourses.map((course) =>
+          course.id === courseId
+            ? { ...course, is_published: !course.is_published }
+            : course
+        )
+      );
+
+      toast({
+        title: "Success",
+        description: `Course is now ${
+          !currentStatus ? "published" : "unpublished"
+        }`,
+      });
     } catch (error) {
       toast({
         title: "Error",
@@ -276,7 +278,9 @@ const CommunitySharing = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => togglePublished(course.id)}
+                        onClick={() =>
+                          togglePublished(course.id, course.is_published)
+                        }
                         className={
                           course.is_published
                             ? "text-green-600 border-green-600"

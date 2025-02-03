@@ -143,7 +143,7 @@ const CommunitySharing = () => {
       if (!response.ok) {
         throw new Error("Failed to update status");
         // If the API call fails, we could revert the optimistic update here
-        setCourses((prevCourses) => [...prevCourses]);
+        // setCourses((prevCourses) => [...prevCourses]);
       }
     } catch (error) {
       toast({

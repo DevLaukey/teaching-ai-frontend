@@ -133,6 +133,8 @@ const onSubmit = async (values) => {
     }
 
     const responseData = await response.json();
+
+    console.log(responseData);
     const courseId = responseData.id; // Extract the actual course ID
 
     // Now, make the second POST request to add course content
@@ -144,13 +146,13 @@ const onSubmit = async (values) => {
           "Content-Type": "application/json",
           Authorization: `Token ${token}`,
         },
-        body: submitData,
+        body: submitData
       }
     );
 
     if (!contentResponse.ok) {
       throw new Error(
-        `Failed to add course content: ${contentResponse.statusText}`
+        `Failed to add course content: ${contentResponse.status}`
       );
     }
 

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -35,11 +35,11 @@ import {
 import {
   Search,
   Filter,
-  Calendar,
+  Star,
   Share2,
   Download,
-  FileText,
-  Pencil,
+  Clock,
+  Users,
   Eye,
   Globe,
   Lock,
@@ -51,9 +51,9 @@ const CommunitySharing = () => {
   const router = useRouter();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSubject, setSelectedSubject] = useState("all");
-  const [selectedTemplate, setSelectedTemplate] = useState("all");
-  const [sortBy, setSortBy] = useState("recent");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedRating, setSelectedRating] = useState("all");
+  const [sortBy, setSortBy] = useState("popular");
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [courses, setCourses] = useState([]);
@@ -76,13 +76,13 @@ const CommunitySharing = () => {
       const queryParams = new URLSearchParams({
         page: currentPage,
         search: searchQuery,
-        subject: selectedSubject,
-        template: selectedTemplate,
+        category: selectedCategory,
+        rating: selectedRating,
         sort: sortBy,
       });
 
       const response = await fetch(
-        `https://eduai-rsjn.onrender.com/courses/?${queryParams}`,
+        `https://eduai-rsjn.onrender.com/courses/`,
         {
           headers: {
             Authorization: `Token ${token}`,
@@ -93,8 +93,8 @@ const CommunitySharing = () => {
       if (!response.ok) throw new Error("Failed to fetch courses");
 
       const data = await response.json();
-      setCourses(data);
-      setTotalPages(Math.ceil(data.length / 10));
+      setCourses(data.results);
+      setTotalPages(Math.ceil(data.count / 10)); // Assuming 10 items per page
     } catch (error) {
       toast({
         title: "Error",
@@ -106,28 +106,23 @@ const CommunitySharing = () => {
     }
   };
 
+  // Fetch courses when filters change
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
       fetchCourses();
     }, 300);
 
     return () => clearTimeout(debounceTimer);
-  }, [searchQuery, selectedSubject, selectedTemplate, sortBy, currentPage]);
+  }, [searchQuery, selectedCategory, selectedRating, sortBy, currentPage]);
 
-  const togglePublished = async (courseId) => {
-    // Optimistically update local state
-    setCourses((prevCourses) =>
-      prevCourses.map((course) =>
-        course.id === courseId ? { ...course, is_published: true } : course
-      )
-    );
-
+  // Toggle course visibility
+  const toggleVisibility = async (courseId, currentStatus) => {
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No authentication token");
 
       const response = await fetch(
-        `https://eduai-rsjn.onrender.com/courses/${courseId}/`,
+        `https://eduai-rsjn.onrender.com/courses/${courseId}/visibility/`,
         {
           method: "PATCH",
           headers: {
@@ -135,51 +130,111 @@ const CommunitySharing = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            is_published: true,
+            is_public: !currentStatus,
           }),
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to update status");
-        // If the API call fails, we could revert the optimistic update here
-        setCourses((prevCourses) => [...prevCourses]);
-      }
+      if (!response.ok) throw new Error("Failed to update visibility");
+
+      setCourses((prevCourses) =>
+        prevCourses.map((course) =>
+          course.id === courseId
+            ? { ...course, isPublic: !course.isPublic }
+            : course
+        )
+      );
+
+      toast({
+        title: "Success",
+        description: `Course is now ${!currentStatus ? "public" : "private"}`,
+      });
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to update course status",
+        description: "Failed to update course visibility",
         variant: "destructive",
       });
     }
   };
 
+  // Download course
+  const downloadCourse = async (courseId) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No authentication token");
+
+      const response = await fetch(
+        `https://eduai-rsjn.onrender.com/courses/${courseId}/download/`,
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) throw new Error("Failed to download course");
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `course-${courseId}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast({
+        title: "Success",
+        description: "Course downloaded successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to download course",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Preview course
+  const previewCourse = (courseId) => {
+    router.push(`/course/${courseId}/preview`);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Header */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex flex-col space-y-4">
             <div className="flex justify-between items-start">
               <div>
-                <h1 className="text-2xl font-bold">Course Library</h1>
-                <p className="text-gray-500">Browse and manage your courses</p>
+                <h1 className="text-2xl font-bold">
+                  Community & Course Sharing
+                </h1>
+                <p className="text-gray-500">
+                  Discover and share educational content
+                </p>
               </div>
               <Dialog>
                 <DialogTrigger asChild>
                   <Button className="space-x-2">
                     <Share2 className="h-4 w-4" />
-                    <span>Create New Course</span>
+                    <span>Share Your Course</span>
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Create New Course</DialogTitle>
+                    <DialogTitle>Share Course</DialogTitle>
                   </DialogHeader>
-                  {/* Add course creation form here */}
+                  {/* Add your course sharing form here */}
                 </DialogContent>
               </Dialog>
             </div>
 
+            {/* Search and Filters */}
             <div className="flex space-x-4">
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -203,35 +258,35 @@ const CommunitySharing = () => {
                   </SheetHeader>
                   <div className="space-y-4 py-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Subject</label>
+                      <label className="text-sm font-medium">Category</label>
                       <Select
-                        value={selectedSubject}
-                        onValueChange={setSelectedSubject}
+                        value={selectedCategory}
+                        onValueChange={setSelectedCategory}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Select subject" />
+                          <SelectValue placeholder="Select category" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="all">All Subjects</SelectItem>
-                          <SelectItem value="AI">AI</SelectItem>
-                          <SelectItem value="Math">Mathematics</SelectItem>
-                          <SelectItem value="Science">Science</SelectItem>
+                          <SelectItem value="all">All Categories</SelectItem>
+                          <SelectItem value="math">Mathematics</SelectItem>
+                          <SelectItem value="science">Science</SelectItem>
+                          <SelectItem value="language">Languages</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Template</label>
+                      <label className="text-sm font-medium">Rating</label>
                       <Select
-                        value={selectedTemplate}
-                        onValueChange={setSelectedTemplate}
+                        value={selectedRating}
+                        onValueChange={setSelectedRating}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Select template" />
+                          <SelectValue placeholder="Select rating" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="all">All Templates</SelectItem>
-                          <SelectItem value="Modern">Modern</SelectItem>
-                          <SelectItem value="Classic">Classic</SelectItem>
+                          <SelectItem value="all">All Ratings</SelectItem>
+                          <SelectItem value="4plus">4+ Stars</SelectItem>
+                          <SelectItem value="3plus">3+ Stars</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -242,8 +297,9 @@ const CommunitySharing = () => {
                           <SelectValue placeholder="Sort by" />
                         </SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="popular">Most Popular</SelectItem>
                           <SelectItem value="recent">Most Recent</SelectItem>
-                          <SelectItem value="title">Title</SelectItem>
+                          <SelectItem value="rating">Highest Rated</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -255,6 +311,7 @@ const CommunitySharing = () => {
         </div>
       </div>
 
+      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-8">
         {loading ? (
           <div className="flex justify-center items-center h-64">
@@ -263,33 +320,34 @@ const CommunitySharing = () => {
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {courses?.map((course) => (
+              {courses.map((course) => (
                 <Card key={course.id} className="overflow-hidden">
                   <CardHeader className="pb-4">
                     <div className="flex justify-between items-start">
-                      <div className="flex items-center space-x-2">
-                        <FileText className="h-5 w-5 text-blue-600" />
-                        <span className="text-sm text-gray-500">
-                          {course.content_type}
+                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <span className="text-blue-600 font-medium">
+                          {course.thumbnail}
                         </span>
                       </div>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => togglePublished(course.id)}
+                        onClick={() =>
+                          toggleVisibility(course.id, course.isPublic)
+                        }
                         className={
-                          course.is_published
+                          course.isPublic
                             ? "text-green-600 border-green-600"
                             : "text-gray-600 border-gray-600"
                         }
                       >
-                        {course.is_published ? (
+                        {course.isPublic ? (
                           <>
-                            <Globe className="h-4 w-4 mr-1" /> Published
+                            <Globe className="h-4 w-4 mr-1" /> Public
                           </>
                         ) : (
                           <>
-                            <Lock className="h-4 w-4 mr-1" /> Draft
+                            <Lock className="h-4 w-4 mr-1" /> Private
                           </>
                         )}
                       </Button>
@@ -302,22 +360,34 @@ const CommunitySharing = () => {
                   <CardContent>
                     <div className="space-y-4">
                       <div className="flex items-center justify-between text-sm text-gray-500">
-                        <div className="flex items-center space-x-2">
-                          <Calendar className="h-4 w-4" />
-                          <span>
-                            {new Date(course.created_at).toLocaleDateString()}
-                          </span>
+                        <div className="flex items-center space-x-1">
+                          <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                          <span>{course.rating}</span>
+                          <span>({course.reviews} reviews)</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <Clock className="h-4 w-4" />
+                          <span>{course.date}</span>
                         </div>
                       </div>
 
                       <div className="flex items-center space-x-2 text-sm text-gray-500">
-                        <div className="flex items-center space-x-2">
-                          <span className="font-medium">Subject:</span>
-                          <span>{course.subject}</span>
+                        <Users className="h-4 w-4" />
+                        <span>Created by {course.author}</span>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-2 text-center text-sm border-t pt-4">
+                        <div>
+                          <div className="font-medium">{course.downloads}</div>
+                          <div className="text-gray-500">Downloads</div>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <span className="font-medium">Template:</span>
-                          <span>{course.template}</span>
+                        <div>
+                          <div className="font-medium">{course.shares}</div>
+                          <div className="text-gray-500">Shares</div>
+                        </div>
+                        <div>
+                          <div className="font-medium">{course.reviews}</div>
+                          <div className="text-gray-500">Reviews</div>
                         </div>
                       </div>
 
@@ -325,20 +395,17 @@ const CommunitySharing = () => {
                         <Button
                           variant="outline"
                           className="flex-1 space-x-2"
-                          onClick={() => router.push(`/course/${course.id}`)}
+                          onClick={() => previewCourse(course.id)}
                         >
                           <Eye className="h-4 w-4" />
-                          <span>View</span>
+                          <span>Preview</span>
                         </Button>
                         <Button
-                          variant="outline"
                           className="flex-1 space-x-2"
-                          onClick={() =>
-                            router.push(`/course/${course.id}/edit`)
-                          }
+                          onClick={() => downloadCourse(course.id)}
                         >
-                          <Pencil className="h-4 w-4" />
-                          <span>Edit</span>
+                          <Download className="h-4 w-4" />
+                          <span>Download</span>
                         </Button>
                       </div>
                     </div>
@@ -347,6 +414,7 @@ const CommunitySharing = () => {
               ))}
             </div>
 
+            {/* Pagination */}
             <div className="mt-8 flex justify-center space-x-2">
               <Button
                 variant="outline"
