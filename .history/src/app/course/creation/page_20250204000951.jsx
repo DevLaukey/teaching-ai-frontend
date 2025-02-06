@@ -102,86 +102,68 @@ const CourseCreation = () => {
     const file = e.target.files[0];
     handleFile(file);
   };
+const onSubmit = async (values) => {
+  setIsCreating(true);
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("Please login to create a course");
+      return;
+    }
 
-  const onSubmit = async (values) => {
-    setIsCreating(true);
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setError("Please login to create a course");
-        return;
+    const submitData = new FormData();
+    Object.keys(values).forEach((key) => {
+      if (key === "media" && values[key]) {
+        submitData.append("media", values[key]);
+      } else if (values[key]) {
+        submitData.append(key, values[key]);
       }
+    });
 
-      const submitData = new FormData();
-      Object.keys(values).forEach((key) => {
-        if (key === "media" && values[key]) {
-          submitData.append("media", values[key]);
-        } else if (values[key]) {
-          submitData.append(key, values[key]);
-        }
-      });
+    const response = await fetch("https://eduai-rsjn.onrender.com/courses/", {
+      method: "POST",
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+      body: submitData,
+    });
 
-      const response = await fetch("https://eduai-rsjn.onrender.com/courses/", {
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const responseData = await response.json();
+    const courseId = responseData.id; // Extract the actual course ID
+
+    // Now, make the second POST request to add course content
+    const contentResponse = await fetch(
+      `https://eduai-rsjn.onrender.com/courses/${courseId}/contents/`,
+      {
         method: "POST",
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Token ${token}`,
         },
         body: submitData,
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
       }
+    );
 
-      const { id } = await response.json();
-      console.log("Course created", id);
-
-      // Append the course ID to the form data
-      submitData.append("course_id", id);
-
-      // Call the second API to generate course content
-      await generateCourseContent(id, submitData);
-    } catch (err) {
-      setError("Failed to create course. Please try again.");
-      console.error("Error:", err);
-    } finally {
-      setIsCreating(false);
-    }
-  };
-
-  const generateCourseContent = async (id, submitData) => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setError("Please login to create a course");
-        return;
-      }
-
-      const response = await fetch(
-        `https://eduai-rsjn.onrender.com/courses/${id}/contents/`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-          body: submitData,
-        }
+    if (!contentResponse.ok) {
+      throw new Error(
+        `Failed to add course content: ${contentResponse.status}`
       );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const responseData = await response.json();
-      console.log("Course content generated", responseData);
-
-      // Redirect to the content preview page
-      router.push(`/course/content-preview/${id}`);
-    } catch (err) {
-      setError("Failed to generate course content. Please try again.");
-      console.error("Error:", err);
     }
-  };
+
+    // Redirect to the content preview page
+    // router.push(`/course/content-preview/${courseId}`);
+  } catch (err) {
+    setError("Failed to create course. Please try again.");
+    console.error("Error:", err);
+  } finally {
+    setIsCreating(false);
+  }
+};
+
 
   return (
     <>

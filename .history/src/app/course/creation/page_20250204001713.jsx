@@ -102,7 +102,6 @@ const CourseCreation = () => {
     const file = e.target.files[0];
     handleFile(file);
   };
-
   const onSubmit = async (values) => {
     setIsCreating(true);
     try {
@@ -133,14 +132,13 @@ const CourseCreation = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const { id } = await response.json();
-      console.log("Course created", id);
 
-      // Append the course ID to the form data
-      submitData.append("course_id", id);
 
-      // Call the second API to generate course content
-      await generateCourseContent(id, submitData);
+      
+      const {id} = await response.json();
+      
+      generateCourseContent(id)
+     
     } catch (err) {
       setError("Failed to create course. Please try again.");
       console.error("Error:", err);
@@ -149,7 +147,8 @@ const CourseCreation = () => {
     }
   };
 
-  const generateCourseContent = async (id, submitData) => {
+
+  const generateCourseContent = async (id) => { 
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -157,32 +156,26 @@ const CourseCreation = () => {
         return;
       }
 
-      const response = await fetch(
-        `https://eduai-rsjn.onrender.com/courses/${id}/contents/`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-          body: submitData,
-        }
-      );
+      const response = await fetch(`https://eduai-rsjn.onrender.com/courses/${id}/content/`, {
+        method: "POST",
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const responseData = await response.json();
-      console.log("Course content generated", responseData);
-
-      // Redirect to the content preview page
-      router.push(`/course/content-preview/${id}`);
+      const response1 = await response.json();
+      console.log(response1)
+      // router.push(`/course/content-preview/${id}`);
     } catch (err) {
-      setError("Failed to generate course content. Please try again.");
+      setError("Failed to create course. Please try again.");
       console.error("Error:", err);
-    }
-  };
-
+    } finally {
+      setIsCreating
+  }
   return (
     <>
       {isCreating && <LoadingSpinner />}

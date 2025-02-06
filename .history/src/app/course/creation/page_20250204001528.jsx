@@ -102,7 +102,6 @@ const CourseCreation = () => {
     const file = e.target.files[0];
     handleFile(file);
   };
-
   const onSubmit = async (values) => {
     setIsCreating(true);
     try {
@@ -133,53 +132,19 @@ const CourseCreation = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const { id } = await response.json();
-      console.log("Course created", id);
 
-      // Append the course ID to the form data
-      submitData.append("course_id", id);
 
-      // Call the second API to generate course content
-      await generateCourseContent(id, submitData);
+      
+      const response1 = await response.json();
+      
+      console.log(response1)
+      const id = response1.id;
+      router.push(`/course/content-preview/${id}`);
     } catch (err) {
       setError("Failed to create course. Please try again.");
       console.error("Error:", err);
     } finally {
       setIsCreating(false);
-    }
-  };
-
-  const generateCourseContent = async (id, submitData) => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setError("Please login to create a course");
-        return;
-      }
-
-      const response = await fetch(
-        `https://eduai-rsjn.onrender.com/courses/${id}/contents/`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-          body: submitData,
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const responseData = await response.json();
-      console.log("Course content generated", responseData);
-
-      // Redirect to the content preview page
-      router.push(`/course/content-preview/${id}`);
-    } catch (err) {
-      setError("Failed to generate course content. Please try again.");
-      console.error("Error:", err);
     }
   };
 
