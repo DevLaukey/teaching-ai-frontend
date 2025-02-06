@@ -36,7 +36,7 @@ import { useToast } from "@/hooks/use-toast";
 const ContentPreview = () => {
   const router = useRouter();
   const id = 2;
-  // const { id } = useParams();
+    // const { id } = useParams();
 
   const { toast } = useToast();
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -52,13 +52,7 @@ const ContentPreview = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `https://eduai-rsjn.onrender.com/courses/${id}/contents/`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Token ${token}`,
-            },
-          }
+          `https://eduai-rsjn.onrender.com/courses/${id}/contents/`
         );
         if (!response.ok) throw new Error("Failed to fetch data");
         const data = await response.json();
@@ -171,7 +165,7 @@ const ContentPreview = () => {
       const response = await fetch(
         `https://eduai-rsjn.onrender.com/courses/${id}/contents/`,
         {
-          method: "PATCH",
+          method: "POST",
           headers: {
             Authorization: `Token ${token}`,
             "Content-Type": "application/json",

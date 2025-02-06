@@ -35,9 +35,7 @@ import { useToast } from "@/hooks/use-toast";
 
 const ContentPreview = () => {
   const router = useRouter();
-  const id = 2;
-  // const { id } = useParams();
-
+  const { id } = useParams();
   const { toast } = useToast();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [showComments, setShowComments] = useState(false);
@@ -51,15 +49,7 @@ const ContentPreview = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(
-          `https://eduai-rsjn.onrender.com/courses/${id}/contents/`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Token ${token}`,
-            },
-          }
-        );
+        const response = await fetch(`YOUR_API_ENDPOINT/${id}`);
         if (!response.ok) throw new Error("Failed to fetch data");
         const data = await response.json();
         const formattedSlides = data.presentation.slides.map((slide) => ({
@@ -168,17 +158,14 @@ const ContentPreview = () => {
       }
 
       // Add your API endpoint here
-      const response = await fetch(
-        `https://eduai-rsjn.onrender.com/courses/${id}/contents/`,
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: `Token ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ slides }),
-        }
-      );
+      const response = await fetch("YOUR_API_ENDPOINT", {
+        method: "POST",
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ slides }),
+      });
 
       if (!response.ok) throw new Error("Failed to save draft");
 

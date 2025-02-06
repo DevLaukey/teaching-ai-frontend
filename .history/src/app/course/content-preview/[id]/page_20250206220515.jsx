@@ -171,7 +171,7 @@ const ContentPreview = () => {
       const response = await fetch(
         `https://eduai-rsjn.onrender.com/courses/${id}/contents/`,
         {
-          method: "PATCH",
+          method: "POST",
           headers: {
             Authorization: `Token ${token}`,
             "Content-Type": "application/json",

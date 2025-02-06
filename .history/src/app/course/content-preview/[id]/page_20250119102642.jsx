@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -35,9 +35,7 @@ import { useToast } from "@/hooks/use-toast";
 
 const ContentPreview = () => {
   const router = useRouter();
-  const id = 2;
-  // const { id } = useParams();
-
+  const { id } = useParams();
   const { toast } = useToast();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [showComments, setShowComments] = useState(false);
@@ -45,45 +43,18 @@ const ContentPreview = () => {
   const [currentHistoryIndex, setCurrentHistoryIndex] = useState(-1);
 
   // Extended slides state with more properties
-  const [slides, setSlides] = useState([]);
-
-  // Fetch API data
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(
-          `https://eduai-rsjn.onrender.com/courses/${id}/contents/`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Token ${token}`,
-            },
-          }
-        );
-        if (!response.ok) throw new Error("Failed to fetch data");
-        const data = await response.json();
-        const formattedSlides = data.presentation.slides.map((slide) => ({
-          id: slide.order,
-          title: slide.title,
-          content: slide.content,
-          fontFamily: slide.style.fontFamily,
-          fontSize: slide.style.fontSize,
-          layout: slide.style.layout,
-          comments: [],
-          images: [],
-        }));
-        setSlides(formattedSlides);
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: "Failed to fetch slides",
-          variant: "destructive",
-        });
-      }
-    };
-
-    fetchData();
-  }, [id, toast]);
+  const [slides, setSlides] = useState([
+    {
+      id: 1,
+      title: "Introduction to Machine Learning",
+      content: "Understanding the basics of ML",
+      fontFamily: "arial",
+      fontSize: "16",
+      layout: "default",
+      comments: [{ id: 1, user: "John", text: "Maybe add more examples here" }],
+      images: [],
+    },
+  ]);
 
   // Handler for updating slide content
   const updateSlide = useCallback(
@@ -168,17 +139,14 @@ const ContentPreview = () => {
       }
 
       // Add your API endpoint here
-      const response = await fetch(
-        `https://eduai-rsjn.onrender.com/courses/${id}/contents/`,
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: `Token ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ slides }),
-        }
-      );
+      const response = await fetch("YOUR_API_ENDPOINT", {
+        method: "POST",
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ slides }),
+      });
 
       if (!response.ok) throw new Error("Failed to save draft");
 
@@ -308,18 +276,18 @@ const ContentPreview = () => {
                 <div className="bg-white rounded-lg border p-8 min-h-[400px] mb-4">
                   <Input
                     className="text-2xl font-bold mb-4 border-none focus:outline-none"
-                    value={slides[currentSlide]?.title || ""}
+                    value={slides[currentSlide].title}
                     onChange={(e) => updateSlide({ title: e.target.value })}
                     placeholder="Slide Title"
                   />
                   <Textarea
                     className="w-full min-h-[300px] border-none focus:outline-none resize-none"
-                    value={slides[currentSlide]?.content || ""}
+                    value={slides[currentSlide].content}
                     onChange={(e) => updateSlide({ content: e.target.value })}
                     placeholder="Slide Content"
                     style={{
-                      fontFamily: slides[currentSlide]?.fontFamily || "arial",
-                      fontSize: `${slides[currentSlide]?.fontSize || "16"}px`,
+                      fontFamily: slides[currentSlide].fontFamily,
+                      fontSize: `${slides[currentSlide].fontSize}px`,
                     }}
                   />
                 </div>
@@ -401,7 +369,7 @@ const ContentPreview = () => {
                         Font Family
                       </label>
                       <Select
-                        value={slides[currentSlide]?.fontFamily || "arial"}
+                        value={slides[currentSlide].fontFamily}
                         onValueChange={(value) =>
                           updateSlide({ fontFamily: value })
                         }
@@ -421,7 +389,7 @@ const ContentPreview = () => {
                         Font Size
                       </label>
                       <Select
-                        value={slides[currentSlide]?.fontSize || "16"}
+                        value={slides[currentSlide].fontSize}
                         onValueChange={(value) =>
                           updateSlide({ fontSize: value })
                         }
@@ -475,7 +443,7 @@ const ContentPreview = () => {
 
                   <TabsContent value="layout" className="space-y-4">
                     <Select
-                      value={slides[currentSlide]?.layout || "default"}
+                      value={slides[currentSlide].layout}
                       onValueChange={(value) => updateSlide({ layout: value })}
                     >
                       <SelectTrigger>
@@ -504,7 +472,7 @@ const ContentPreview = () => {
                   <div className="mt-6 pt-6 border-t space-y-4">
                     <h3 className="font-medium">Comments</h3>
                     <div className="space-y-4">
-                      {slides[currentSlide]?.comments.map((comment) => (
+                      {slides[currentSlide].comments.map((comment) => (
                         <div
                           key={comment.id}
                           className="bg-gray-50 p-3 rounded-lg"
