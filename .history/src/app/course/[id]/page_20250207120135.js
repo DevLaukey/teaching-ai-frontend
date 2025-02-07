@@ -127,18 +127,10 @@ const CourseView = () => {
             <Card>
               <CardContent className="p-6">
                 <div className="aspect-video bg-gray-100 rounded-lg mb-6 flex items-center justify-center">
-                  {courseData.media ? (
-                    <img
-                      src={courseData.media}
-                      alt={courseData.title}
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center justify-center text-gray-400">
-                      <ImageIcon className="h-16 w-16 mb-2" />
-                      <p className="text-sm">No media available</p>
-                    </div>
-                  )}
+                  <div className="flex flex-col items-center justify-center text-gray-400">
+                    <ImageIcon className="h-16 w-16 mb-2" />
+                    <p className="text-sm">No media available</p>
+                  </div>
                 </div>
                 <p className="text-gray-600">{courseData.description}</p>
 

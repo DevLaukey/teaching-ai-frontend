@@ -208,7 +208,7 @@ const [mediaType, setMediaType] = useState(null);
         description: "Course updated successfully",
       });
 
-      router.push(`/course/${id}`);
+      router.push("/course");
     } catch (error) {
       console.error("Error updating course:", error);
       toast({

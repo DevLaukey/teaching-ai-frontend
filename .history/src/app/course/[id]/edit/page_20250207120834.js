@@ -162,13 +162,65 @@ const [mediaType, setMediaType] = useState(null);
     return null;
   };
 
+const clearMedia = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
 
-  const clearMedia = () => {
+    // Get current form values
+    const currentValues = form.getValues();
+
+    // Create FormData with all current values but null media
+    const formData = new FormData();
+    formData.append("subject", currentValues.subject);
+    formData.append("title", currentValues.title);
+    formData.append("description", currentValues.description);
+    formData.append("content_type", currentValues.content_type);
+    formData.append("template", currentValues.template);
+    formData.append("details", currentValues.details || "");
+    formData.append("media", "null"); // Send "null" string to clear media
+
+    const response = await fetch(
+      `https://eduai-rsjn.onrender.com/courses/${id}/`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+        body: formData,
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Server response:", errorData);
+      throw new Error(errorData.detail || "Failed to clear media");
+    }
+
+    // Update local state
     form.setValue("media", null);
     setMediaPreview(null);
     setExistingMedia(null);
     setMediaType(null);
-  };
+
+    toast({
+      title: "Success",
+      description: "Media cleared successfully",
+    });
+  } catch (error) {
+    console.error("Error clearing media:", error);
+    toast({
+      title: "Error",
+      description: "Failed to clear media. Please try again.",
+      variant: "destructive",
+    });
+
+    // Re-fetch course data to ensure UI is in sync with server
+    fetchCourseData();
+  }
+};
 
   // Submit handler
   const onSubmit = async (values) => {

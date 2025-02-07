@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -9,11 +9,25 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Image as ImageIcon } from "lucide-react";
+import { Image as ImageIcon } from "lucide-react"; 
 import { useToast } from "@/hooks/use-toast";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Book, Edit, FileText, Clock, Users } from "lucide-react";
-
+import {
+  ArrowLeft,
+  BarChart,
+  Book,
+  Edit,
+  Download,
+  Share2,
+  Users,
+  Star,
+  MessageSquare,
+  MoreVertical,
+  PlayCircle,
+  FileText,
+  Settings,
+  Clock,
+} from "lucide-react";
 const CourseView = () => {
   const param = useParams();
   const { id } = param;
@@ -50,6 +64,7 @@ const CourseView = () => {
         }
 
         const data = await response.json();
+
         setCourseData(data);
       } catch (error) {
         console.error("Error fetching course:", error);
@@ -65,6 +80,82 @@ const CourseView = () => {
 
     fetchCourseData();
   }, [id, toast]);
+
+
+  const handleDownload = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast({
+          title: "Error",
+          description: "Please login to download materials",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // First check if there are materials to download
+      if (!courseData.materials_url) {
+        toast({
+          title: "No Materials",
+          description:
+            "No downloadable materials are available for this course",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Start download process
+      const response = await fetch(courseData.materials_url, {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to download materials");
+      }
+
+      // Get filename from Content-Disposition header or use default
+      const contentDisposition = response.headers.get("Content-Disposition");
+      let filename = "course-materials";
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+        if (filenameMatch) {
+          filename = filenameMatch[1];
+        }
+      }
+
+      // Convert response to blob
+      const blob = await response.blob();
+
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+
+      // Cleanup
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast({
+        title: "Success",
+        description: "Download started successfully",
+      });
+    } catch (error) {
+      console.error("Download error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to download materials. Please try again later.",
+        variant: "destructive",
+      });
+    }
+  };
 
   if (loading) {
     return (
@@ -86,6 +177,11 @@ const CourseView = () => {
       </div>
     );
   }
+
+  const isVideo =
+    courseData.media?.toLowerCase().endsWith(".mp4") ||
+    courseData.media?.toLowerCase().endsWith(".mov") ||
+    courseData.media?.toLowerCase().endsWith(".webm");
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -126,13 +222,21 @@ const CourseView = () => {
             {/* Course Overview */}
             <Card>
               <CardContent className="p-6">
-                <div className="aspect-video bg-gray-100 rounded-lg mb-6 flex items-center justify-center">
+                <div className="aspect-video bg-gray-200 rounded-lg mb-6 flex items-center justify-center">
                   {courseData.media ? (
-                    <img
-                      src={courseData.media}
-                      alt={courseData.title}
-                      className="w-full h-full object-cover rounded-lg"
-                    />
+                    isVideo ? (
+                      <video
+                        src={courseData.media}
+                        controls
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <img
+                        src={courseData.media}
+                        alt={courseData.title}
+                        className="w-full h-full object-cover"
+                      />
+                    )
                   ) : (
                     <div className="flex flex-col items-center justify-center text-gray-400">
                       <ImageIcon className="h-16 w-16 mb-2" />
@@ -142,27 +246,34 @@ const CourseView = () => {
                 </div>
                 <p className="text-gray-600">{courseData.description}</p>
 
-                <div className="grid grid-cols-3 gap-4 mt-6">
+                <div className="grid grid-cols-4 gap-4 mt-6">
+                  <div className="text-center">
+                    <Clock className="h-6 w-6 mx-auto text-gray-400 mb-2" />
+                    <div className="text-sm font-medium">
+                      {courseData.duration || "Not specified"}
+                    </div>
+                    <div className="text-xs text-gray-500">Duration</div>
+                  </div>
                   <div className="text-center">
                     <FileText className="h-6 w-6 mx-auto text-gray-400 mb-2" />
-                    <div className="text-sm font-medium capitalize">
+                    <div className="text-sm font-medium">
                       {courseData.content_type}
                     </div>
                     <div className="text-xs text-gray-500">Content Type</div>
                   </div>
                   <div className="text-center">
-                    <Book className="h-6 w-6 mx-auto text-gray-400 mb-2" />
-                    <div className="text-sm font-medium capitalize">
-                      {courseData.subject}
-                    </div>
-                    <div className="text-xs text-gray-500">Subject</div>
-                  </div>
-                  <div className="text-center">
                     <Users className="h-6 w-6 mx-auto text-gray-400 mb-2" />
                     <div className="text-sm font-medium">
-                      {courseData.is_published ? "Published" : "Draft"}
+                      {courseData.enrolled_students || 0}
                     </div>
-                    <div className="text-xs text-gray-500">Status</div>
+                    <div className="text-xs text-gray-500">Enrolled</div>
+                  </div>
+                  <div className="text-center">
+                    <Star className="h-6 w-6 mx-auto text-gray-400 mb-2" />
+                    <div className="text-sm font-medium">
+                      {courseData.rating || "N/A"}
+                    </div>
+                    <div className="text-xs text-gray-500">Rating</div>
                   </div>
                 </div>
               </CardContent>
@@ -197,10 +308,18 @@ const CourseView = () => {
                       <span>Template</span>
                       <span className="capitalize">{courseData.template}</span>
                     </div>
-                    <div className="flex justify-between text-sm mb-2">
-                      <span>Author ID</span>
-                      <span>{courseData.author}</span>
-                    </div>
+                  </div>
+
+                  <div className="pt-4 space-y-2">
+                    {/* <Button className="w-full">Start Learning</Button> */}
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={handleDownload}
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Download Materials
+                    </Button>
                   </div>
                 </div>
               </CardContent>

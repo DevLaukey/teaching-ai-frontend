@@ -252,14 +252,14 @@ const MyCourses = () => {
              >
                <MessageSquare className="h-4 w-4 mr-2" />
                <span>Analytics</span>
-             </Button>
+             </Button> */}
              <Button
                variant="outline"
-               onClick={() => router.push("/course/collaboration")}
+               onClick={() => router.push("/community")}
              >
                <Users className="h-4 w-4 mr-2" />
-               <span>Collaboration</span>
-             </Button> */}
+               <span>Community</span>
+             </Button>
              <Button
                onClick={() => router.push(`/course/analytics/`)}
                variant="outline"

@@ -44,6 +44,7 @@ import {
   MoreHorizontal,
   Eye,
   CheckCircle,
+  BarChart,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -79,6 +80,8 @@ const MyCourses = () => {
      }
 
      const data = await response.json();
+
+     console.log(data);
      // Transform the API data to match our component's expected format
      const transformedCourses = data.map((course) => ({
        id: course.id,
@@ -173,6 +176,11 @@ const MyCourses = () => {
        throw new Error("No authentication token found");
      }
 
+
+     if (!selectedCourses.length) {
+       throw new Error("No courses selected");
+     }
+     console.log("Deleting courses:", selectedCourses);
      // Delete each selected course
      await Promise.all(
        selectedCourses.map(async (courseId) => {
@@ -191,6 +199,7 @@ const MyCourses = () => {
          }
        })
      );
+
 
      // Refresh the courses list
      fetchCourses();
@@ -237,34 +246,29 @@ const MyCourses = () => {
              </p>
            </div>
            <div className="flex items-center space-x-4">
-             <Button
+             {/* <Button
                variant="outline"
                onClick={() => router.push("/course/analytics")}
              >
                <MessageSquare className="h-4 w-4 mr-2" />
                <span>Analytics</span>
-             </Button>
+             </Button> */}
              <Button
                variant="outline"
-               onClick={() => router.push("/course/collaboration")}
+               onClick={() => router.push("/community")}
              >
                <Users className="h-4 w-4 mr-2" />
-               <span>Collaboration</span>
+               <span>Community</span>
              </Button>
              <Button
+               onClick={() => router.push(`/course/analytics/`)}
                variant="outline"
-               onClick={() => router.push("/course/content-preview")}
+               className="w-full space-x-2"
              >
-               <Eye className="h-4 w-4 mr-2" />
-               <span>Preview</span>
+               <BarChart className="h-4 w-4" />
+               <span>View Analytics</span>
              </Button>
-             <Button
-               variant="outline"
-               onClick={() => router.push("/course/finalization")}
-             >
-               <CheckCircle className="h-4 w-4 mr-2" />
-               <span>Finalize</span>
-             </Button>
+
              <Button className="space-x-2" onClick={handleCreateCourse}>
                <Plus className="h-4 w-4" />
                <span>Create New Course</span>
@@ -328,7 +332,6 @@ const MyCourses = () => {
                  </span>
                </div>
                <div className="flex space-x-2">
-                
                  <Button variant="outline" size="sm">
                    <Download className="h-4 w-4 mr-2" />
                    Export
@@ -422,10 +425,7 @@ const MyCourses = () => {
                          <Edit className="h-4 w-4 mr-2" />
                          Edit
                        </DropdownMenuItem>
-                       <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
-                         <Share2 className="h-4 w-4 mr-2" />
-                         Share
-                       </DropdownMenuItem>
+
                        <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
                          <Download className="h-4 w-4 mr-2" />
                          Export
