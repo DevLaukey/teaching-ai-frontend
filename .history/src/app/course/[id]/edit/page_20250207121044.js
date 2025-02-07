@@ -220,45 +220,38 @@ const [mediaType, setMediaType] = useState(null);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
-        {/* Header */}
-        <div className="mb-4 sm:mb-6">
+        <div className="mb-6">
           <Button
             variant="ghost"
             onClick={() => router.back()}
-            className="mb-2 sm:mb-4"
+            className="mb-4"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            <span className="hidden sm:inline">Back</span>
+            Back
           </Button>
-          <h1 className="text-xl sm:text-2xl font-bold">Edit Course</h1>
+          <h1 className="text-2xl font-bold">Edit Course</h1>
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)}>
             <Card>
-              <CardHeader className="p-4 sm:p-6">
+              <CardHeader>
                 <CardTitle>Course Details</CardTitle>
               </CardHeader>
-              <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+              <CardContent className="space-y-6">
                 {/* Subject */}
                 <FormField
                   control={form.control}
                   name="subject"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm sm:text-base">
-                        Subject
-                      </FormLabel>
+                      <FormLabel>Subject</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="Enter course subject"
-                          {...field}
-                          className="text-sm sm:text-base"
-                        />
+                        <Input placeholder="Enter course subject" {...field} />
                       </FormControl>
-                      <FormMessage className="text-xs sm:text-sm" />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -269,17 +262,11 @@ const [mediaType, setMediaType] = useState(null);
                   name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm sm:text-base">
-                        Course Title
-                      </FormLabel>
+                      <FormLabel>Course Title</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="Enter course title"
-                          {...field}
-                          className="text-sm sm:text-base"
-                        />
+                        <Input placeholder="Enter course title" {...field} />
                       </FormControl>
-                      <FormMessage className="text-xs sm:text-sm" />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -290,84 +277,72 @@ const [mediaType, setMediaType] = useState(null);
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm sm:text-base">
-                        Description
-                      </FormLabel>
+                      <FormLabel>Description</FormLabel>
                       <FormControl>
                         <Textarea
                           placeholder="Enter course description"
                           {...field}
                           rows={4}
-                          className="text-sm sm:text-base min-h-[100px]"
                         />
                       </FormControl>
-                      <FormMessage className="text-xs sm:text-sm" />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                {/* Content Type and Template in a grid on larger screens */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                  {/* Content Type */}
-                  <FormField
-                    control={form.control}
-                    name="content_type"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm sm:text-base">
-                          Content Type
-                        </FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger className="text-sm sm:text-base">
-                              <SelectValue placeholder="Select content type" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="powerpoint">
-                              PowerPoint
-                            </SelectItem>
-                            <SelectItem value="document">Document</SelectItem>
-                            <SelectItem value="video">Video</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage className="text-xs sm:text-sm" />
-                      </FormItem>
-                    )}
-                  />
+                {/* Content Type */}
+                <FormField
+                  control={form.control}
+                  name="content_type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Content Type</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select content type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="powerpoint">PowerPoint</SelectItem>
+                          <SelectItem value="document">Document</SelectItem>
+                          <SelectItem value="video">Video</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                  {/* Template */}
-                  <FormField
-                    control={form.control}
-                    name="template"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm sm:text-base">
-                          Template
-                        </FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger className="text-sm sm:text-base">
-                              <SelectValue placeholder="Select template" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="classic">Classic</SelectItem>
-                            <SelectItem value="modern">Modern</SelectItem>
-                            <SelectItem value="minimal">Minimal</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage className="text-xs sm:text-sm" />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                {/* Template */}
+                <FormField
+                  control={form.control}
+                  name="template"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Template</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select template" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="classic">Classic</SelectItem>
+                          <SelectItem value="modern">Modern</SelectItem>
+                          <SelectItem value="minimal">Minimal</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 {/* Details */}
                 <FormField
@@ -375,18 +350,15 @@ const [mediaType, setMediaType] = useState(null);
                   name="details"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm sm:text-base">
-                        Additional Details
-                      </FormLabel>
+                      <FormLabel>Additional Details</FormLabel>
                       <FormControl>
                         <Textarea
                           placeholder="Enter additional details"
                           {...field}
                           rows={4}
-                          className="text-sm sm:text-base min-h-[100px]"
                         />
                       </FormControl>
-                      <FormMessage className="text-xs sm:text-sm" />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -397,12 +369,10 @@ const [mediaType, setMediaType] = useState(null);
                   name="media"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm sm:text-base">
-                        Course Media
-                      </FormLabel>
+                      <FormLabel>Course Media</FormLabel>
                       <FormControl>
-                        <div className="flex flex-col items-center p-4 sm:p-6 border-2 border-dashed rounded-lg border-gray-300 hover:border-gray-400 transition-colors">
-                          <Upload className="h-6 w-6 sm:h-8 sm:w-8 mb-2 sm:mb-4 text-gray-400" />
+                        <div className="flex flex-col items-center p-6 border-2 border-dashed rounded-lg border-gray-300 hover:border-gray-400 transition-colors">
+                          <Upload className="h-8 w-8 mb-4 text-gray-400" />
                           <input
                             type="file"
                             accept="image/*,video/*"
@@ -412,14 +382,14 @@ const [mediaType, setMediaType] = useState(null);
                           />
                           <label
                             htmlFor="media-upload"
-                            className="cursor-pointer text-xs sm:text-sm text-gray-600 hover:text-gray-800 text-center"
+                            className="cursor-pointer text-sm text-gray-600 hover:text-gray-800"
                           >
                             Click to upload image or video
                           </label>
 
                           {/* Preview section */}
                           {(mediaPreview || existingMedia) && (
-                            <div className="mt-4 relative w-full max-w-md mx-auto">
+                            <div className="mt-4 relative">
                               <Button
                                 type="button"
                                 variant="ghost"
@@ -429,35 +399,27 @@ const [mediaType, setMediaType] = useState(null);
                               >
                                 <X className="h-4 w-4" />
                               </Button>
-                              <div className="flex justify-center">
-                                {renderMediaPreview()}
-                              </div>
+                              {renderMediaPreview()}
                             </div>
                           )}
                         </div>
                       </FormControl>
-                      <FormMessage className="text-xs sm:text-sm" />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
               </CardContent>
             </Card>
 
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:justify-end">
+            <div className="mt-6 flex justify-end space-x-4">
               <Button
                 variant="outline"
                 onClick={() => router.back()}
                 type="button"
-                className="w-full sm:w-auto"
               >
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                disabled={form.formState.isSubmitting}
-                className="w-full sm:w-auto"
-              >
+              <Button type="submit" disabled={form.formState.isSubmitting}>
                 {form.formState.isSubmitting ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />

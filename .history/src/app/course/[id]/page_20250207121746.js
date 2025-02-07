@@ -9,7 +9,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Eye, Image as ImageIcon } from "lucide-react";
+import { Image as ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Book, Edit, FileText, Clock, Users } from "lucide-react";
@@ -107,17 +107,9 @@ const CourseView = () => {
                 </p>
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
+            <div>
               <Button
-                variant="outline"
-                className="w-full sm:w-auto order-2 sm:order-1"
-                onClick={() => router.push(`/course/content-preview/${id}`)}
-              >
-                <Eye className="h-4 w-4 mr-2" />
-                <span>Preview Content</span>
-              </Button>
-              <Button
-                className="w-full sm:w-auto order-1 sm:order-2"
+                className="w-full sm:w-auto"
                 onClick={() => router.push(`/course/${id}/edit`)}
               >
                 <Edit className="h-4 w-4 mr-2" />
