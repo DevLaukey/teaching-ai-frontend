@@ -35,14 +35,16 @@ import { useToast } from "@/hooks/use-toast";
 
 const ContentPreview = () => {
   const router = useRouter();
-  const { id } = useParams();
+  const id = 2;
+  // const { id } = useParams();
 
   const { toast } = useToast();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [showComments, setShowComments] = useState(false);
   const [history, setHistory] = useState([]);
   const [currentHistoryIndex, setCurrentHistoryIndex] = useState(-1);
-  const token = localStorage.getItem("token");
+        const token = localStorage.getItem("token");
+
 
   // Extended slides state with more properties
   const [slides, setSlides] = useState([]);
@@ -50,6 +52,8 @@ const ContentPreview = () => {
   // Fetch API data
   useEffect(() => {
     const fetchData = async () => {
+
+
       console.log("Fetching data", token);
       try {
         const response = await fetch(
@@ -65,19 +69,17 @@ const ContentPreview = () => {
         if (!response.ok) throw new Error("Failed to fetch data");
         const data = await response.json();
 
-        console.log(data[0].slides);
-        const formattedSlides = data[0].slides.map((slide) => ({
+        console.log(data);  
+        const formattedSlides = data.presentation.slides.map((slide) => ({
           id: slide.order,
           title: slide.title,
           content: slide.content,
-          fontFamily: slide.fontFamily,
-          fontSize: slide.fontSize,
-          layout: slide.layout,
+          fontFamily: slide.style.fontFamily,
+          fontSize: slide.style.fontSize,
+          layout: slide.style.layout,
           comments: [],
           images: [],
         }));
-
-        console.log(formattedSlides);
         setSlides(formattedSlides);
       } catch (error) {
         toast({

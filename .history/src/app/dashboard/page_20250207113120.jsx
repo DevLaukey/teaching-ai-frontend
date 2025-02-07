@@ -26,6 +26,7 @@ import {
   GraduationCap,
   Laptop,
   HelpCircle,
+  ChartAreaIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -45,11 +46,8 @@ const Dashboard = () => {
       (a, b) => new Date(b.created_at) - new Date(a.created_at)
     );
 
-    // Get the 3 most recent courses and format them
-    return sorted.slice(0, 3).map((course) => ({
-      ...course,
-      lastEdited: formatTimeAgo(new Date(course.updated_at)),
-    }));
+    // Get the 3 most recent courses
+    return sorted.slice(0, 3);
   };
 
   // Function to get recent activity
@@ -69,6 +67,14 @@ const Dashboard = () => {
         type = "edit";
       }
 
+      console.log(
+        course.id,
+        type,
+        course.title,
+        timeAgo,
+        course.subject,
+        course.is_published
+      );
       return {
         id: course.id,
         type,
@@ -135,7 +141,6 @@ const Dashboard = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
     localStorage.removeItem("isAuthenticated");
     localStorage.removeItem("userProfile");
     router.push("/auth/login");
@@ -144,28 +149,6 @@ const Dashboard = () => {
   const handleCourseClick = (courseId) => {
     router.push(`/course/${courseId}`);
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-red-500">Error: {error}</div>
-      </div>
-    );
-  }
-
-  const publishedCourses = courses.filter((course) => course.is_published);
-  const completionRate =
-    publishedCourses.length > 0
-      ? Math.round((publishedCourses.length / courses.length) * 100)
-      : 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -282,7 +265,7 @@ const Dashboard = () => {
                     className="w-full space-x-2"
                     onClick={() => router.push("/course/analytics")}
                   >
-                    <BarChart className="h-4 w-4" />
+                    <ChartAreaIcon className="h-4 w-4" />
                     <span>View Analytics</span>
                   </Button>
                 </CardContent>
@@ -304,12 +287,8 @@ const Dashboard = () => {
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <Users className="h-8 w-8 mx-auto text-green-600 mb-2" />
-                    <div className="text-2xl font-bold">
-                      {publishedCourses.length}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      Published Courses
-                    </div>
+                    <div className="text-2xl font-bold">{courses.length}</div>
+                    <div className="text-sm text-gray-500">Total Students</div>
                   </div>
                 </CardContent>
               </Card>
@@ -317,10 +296,8 @@ const Dashboard = () => {
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <BarChart className="h-8 w-8 mx-auto text-purple-600 mb-2" />
-                    <div className="text-2xl font-bold">{completionRate}%</div>
-                    <div className="text-sm text-gray-500">
-                      Publication Rate
-                    </div>
+                    <div className="text-2xl font-bold">85%</div>
+                    <div className="text-sm text-gray-500">Completion Rate</div>
                   </div>
                 </CardContent>
               </Card>
@@ -328,10 +305,8 @@ const Dashboard = () => {
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <MessageSquare className="h-8 w-8 mx-auto text-yellow-600 mb-2" />
-                    <div className="text-2xl font-bold">
-                      {courses.length > 0 ? courses.length : 0}
-                    </div>
-                    <div className="text-sm text-gray-500">Total Contents</div>
+                    <div className="text-2xl font-bold">4.8</div>
+                    <div className="text-sm text-gray-500">Average Rating</div>
                   </div>
                 </CardContent>
               </Card>
@@ -367,7 +342,7 @@ const Dashboard = () => {
                           size="icon"
                           onClick={(e) => {
                             e.stopPropagation();
-                            router.push(`/course/${course.id}/edit`);
+                            router.push(`/courses/${course.id}/edit`);
                           }}
                         >
                           <Edit className="h-4 w-4" />
@@ -402,28 +377,15 @@ const Dashboard = () => {
                       className="flex items-center space-x-4"
                     >
                       <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                        {activity.type === "edit" ? (
-                          <Edit className="h-4 w-4 text-gray-600" />
-                        ) : (
-                          <Clock className="h-4 w-4 text-gray-600" />
-                        )}
+                        <Clock className="h-4 w-4 text-gray-600" />
                       </div>
                       <div>
                         <div className="text-sm">
                           You {activity.type}d{" "}
                           <span className="font-medium">{activity.course}</span>
-                          {activity.is_published ? (
-                            <span className="ml-2 text-xs text-green-600">
-                              (Published)
-                            </span>
-                          ) : (
-                            <span className="ml-2 text-xs text-gray-500">
-                              (Draft)
-                            </span>
-                          )}
                         </div>
                         <div className="text-xs text-gray-500">
-                          {activity.time} • {activity.subject}
+                          {activity.time}
                         </div>
                       </div>
                     </div>

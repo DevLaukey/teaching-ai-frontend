@@ -51,10 +51,11 @@ const LoginPage = () => {
         throw new Error(data.non_field_errors || "Login failed");
       }
 
-
+\
 
       // Store the token if your backend sends one
       if (data.auth_token) {
+        console.log(data.auth_token);
         localStorage.setItem("token", data.auth_token);
       }
 

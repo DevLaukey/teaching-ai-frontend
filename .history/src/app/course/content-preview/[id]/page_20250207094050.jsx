@@ -65,19 +65,17 @@ const ContentPreview = () => {
         if (!response.ok) throw new Error("Failed to fetch data");
         const data = await response.json();
 
-        console.log(data[0].slides);
-        const formattedSlides = data[0].slides.map((slide) => ({
+        console.log(data);
+        const formattedSlides = data.presentation.slides.map((slide) => ({
           id: slide.order,
           title: slide.title,
           content: slide.content,
-          fontFamily: slide.fontFamily,
-          fontSize: slide.fontSize,
-          layout: slide.layout,
+          fontFamily: slide.style.fontFamily,
+          fontSize: slide.style.fontSize,
+          layout: slide.style.layout,
           comments: [],
           images: [],
         }));
-
-        console.log(formattedSlides);
         setSlides(formattedSlides);
       } catch (error) {
         toast({

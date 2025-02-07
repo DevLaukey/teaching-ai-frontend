@@ -26,146 +26,121 @@ import {
   GraduationCap,
   Laptop,
   HelpCircle,
+  ChartAreaIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const Dashboard = () => {
-  const router = useRouter();
+const router = useRouter();
 
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [recentCourses, setRecentCourses] = useState([]);
-  const [recentActivity, setRecentActivity] = useState([]);
+const [courses, setCourses] = useState([]);
+const [loading, setLoading] = useState(true);
+const [error, setError] = useState(null);
+const [recentCourses, setRecentCourses] = useState([]);
+const [recentActivity, setRecentActivity] = useState([]);
 
-  // Function to get recent courses
-  const getRecentCourses = (allCourses) => {
-    // Sort courses by created_at date in descending order
-    const sorted = [...allCourses].sort(
-      (a, b) => new Date(b.created_at) - new Date(a.created_at)
-    );
+// Function to get recent courses
+const getRecentCourses = (allCourses) => {
+  // Sort courses by created_at date in descending order
+  const sorted = [...allCourses].sort(
+    (a, b) => new Date(b.created_at) - new Date(a.created_at)
+  );
 
-    // Get the 3 most recent courses and format them
-    return sorted.slice(0, 3).map((course) => ({
-      ...course,
-      lastEdited: formatTimeAgo(new Date(course.updated_at)),
-    }));
-  };
+  // Get the 3 most recent courses
+  return sorted.slice(0, 3);
+};
 
-  // Function to get recent activity
-  const getRecentActivity = (allCourses) => {
-    // Sort courses by created_at date in descending order
-    const sorted = [...allCourses].sort(
-      (a, b) => new Date(b.created_at) - new Date(a.created_at)
-    );
+// Function to get recent activity
+const getRecentActivity = (allCourses) => {
+  // Sort courses by created_at date in descending order
+  const sorted = [...allCourses].sort(
+    (a, b) => new Date(b.created_at) - new Date(a.created_at)
+  );
 
-    // Get the 2 most recent courses and format them as activities
-    return sorted.slice(0, 2).map((course) => {
-      const timeAgo = formatTimeAgo(new Date(course.created_at));
-      let type = "create";
+  // Get the 2 most recent courses and format them as activities
+  return sorted.slice(0, 2).map((course) => {
+    const timeAgo = formatTimeAgo(new Date(course.created_at));
+    let type = "create";
 
-      // If the updated_at is different from created_at, it's an edit
-      if (course.updated_at !== course.created_at) {
-        type = "edit";
-      }
+    // If the updated_at is different from created_at, it's an edit
+    if (course.updated_at !== course.created_at) {
+      type = "edit";
+    }
 
-      return {
-        id: course.id,
-        type,
-        course: course.title,
-        time: timeAgo,
-        subject: course.subject,
-        is_published: course.is_published,
-      };
-    });
-  };
+    return {
+      id: course.id,
+      type,
+      course: course.title,
+      time: timeAgo,
+      subject: course.subject,
+      is_published: course.is_published,
+    };
+  });
+};
 
-  // Helper function to format time ago
-  const formatTimeAgo = (date) => {
-    const now = new Date();
-    const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
+// Helper function to format time ago
+const formatTimeAgo = (date) => {
+  const now = new Date();
+  const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
 
-    if (diffInHours < 24) {
-      return `${diffInHours} hours ago`;
+  if (diffInHours < 24) {
+    return `${diffInHours} hours ago`;
+  } else {
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays === 1) {
+      return "1 day ago";
+    } else if (diffInDays < 7) {
+      return `${diffInDays} days ago`;
     } else {
-      const diffInDays = Math.floor(diffInHours / 24);
-      if (diffInDays === 1) {
-        return "1 day ago";
-      } else if (diffInDays < 7) {
-        return `${diffInDays} days ago`;
-      } else {
-        const diffInWeeks = Math.floor(diffInDays / 7);
-        return `${diffInWeeks} week${diffInWeeks === 1 ? "" : "s"} ago`;
-      }
+      const diffInWeeks = Math.floor(diffInDays / 7);
+      return `${diffInWeeks} week${diffInWeeks === 1 ? "" : "s"} ago`;
     }
-  };
+  }
+};
 
-  useEffect(() => {
-    fetchCourses();
-  }, []);
+useEffect(() => {
+  fetchCourses();
+}, []);
 
-  const fetchCourses = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("No authentication token found");
-      }
-
-      const response = await fetch("https://eduai-rsjn.onrender.com/courses/", {
-        method: "GET",
-        headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch courses");
-      }
-
-      const data = await response.json();
-      setCourses(data);
-      setRecentCourses(getRecentCourses(data));
-      setRecentActivity(getRecentActivity(data));
-      setLoading(false);
-    } catch (err) {
-      setError(err.message);
-      setLoading(false);
+const fetchCourses = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("No authentication token found");
     }
-  };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("isAuthenticated");
-    localStorage.removeItem("userProfile");
-    router.push("/auth/login");
-  };
+    const response = await fetch("https://eduai-rsjn.onrender.com/courses/", {
+      method: "GET",
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
 
-  const handleCourseClick = (courseId) => {
-    router.push(`/course/${courseId}`);
-  };
+    if (!response.ok) {
+      throw new Error("Failed to fetch courses");
+    }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
+    const data = await response.json();
+    setCourses(data);
+    setRecentCourses(getRecentCourses(data));
+    setRecentActivity(getRecentActivity(data));
+    setLoading(false);
+  } catch (err) {
+    setError(err.message);
+    setLoading(false);
   }
+};
 
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-red-500">Error: {error}</div>
-      </div>
-    );
-  }
+const handleLogout = () => {
+  localStorage.removeItem("isAuthenticated");
+  localStorage.removeItem("userProfile");
+  router.push("/auth/login");
+};
 
-  const publishedCourses = courses.filter((course) => course.is_published);
-  const completionRate =
-    publishedCourses.length > 0
-      ? Math.round((publishedCourses.length / courses.length) * 100)
-      : 0;
+const handleCourseClick = (courseId) => {
+  router.push(`/course/${courseId}`);
+};
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -282,7 +257,7 @@ const Dashboard = () => {
                     className="w-full space-x-2"
                     onClick={() => router.push("/course/analytics")}
                   >
-                    <BarChart className="h-4 w-4" />
+                    <ChartAreaIcon className="h-4 w-4" />
                     <span>View Analytics</span>
                   </Button>
                 </CardContent>
@@ -304,12 +279,8 @@ const Dashboard = () => {
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <Users className="h-8 w-8 mx-auto text-green-600 mb-2" />
-                    <div className="text-2xl font-bold">
-                      {publishedCourses.length}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      Published Courses
-                    </div>
+                    <div className="text-2xl font-bold">{courses.length}</div>
+                    <div className="text-sm text-gray-500">Total Students</div>
                   </div>
                 </CardContent>
               </Card>
@@ -317,10 +288,8 @@ const Dashboard = () => {
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <BarChart className="h-8 w-8 mx-auto text-purple-600 mb-2" />
-                    <div className="text-2xl font-bold">{completionRate}%</div>
-                    <div className="text-sm text-gray-500">
-                      Publication Rate
-                    </div>
+                    <div className="text-2xl font-bold">85%</div>
+                    <div className="text-sm text-gray-500">Completion Rate</div>
                   </div>
                 </CardContent>
               </Card>
@@ -328,10 +297,8 @@ const Dashboard = () => {
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <MessageSquare className="h-8 w-8 mx-auto text-yellow-600 mb-2" />
-                    <div className="text-2xl font-bold">
-                      {courses.length > 0 ? courses.length : 0}
-                    </div>
-                    <div className="text-sm text-gray-500">Total Contents</div>
+                    <div className="text-2xl font-bold">4.8</div>
+                    <div className="text-sm text-gray-500">Average Rating</div>
                   </div>
                 </CardContent>
               </Card>
@@ -367,7 +334,7 @@ const Dashboard = () => {
                           size="icon"
                           onClick={(e) => {
                             e.stopPropagation();
-                            router.push(`/course/${course.id}/edit`);
+                            router.push(`/courses/${course.id}/edit`);
                           }}
                         >
                           <Edit className="h-4 w-4" />
@@ -402,28 +369,15 @@ const Dashboard = () => {
                       className="flex items-center space-x-4"
                     >
                       <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                        {activity.type === "edit" ? (
-                          <Edit className="h-4 w-4 text-gray-600" />
-                        ) : (
-                          <Clock className="h-4 w-4 text-gray-600" />
-                        )}
+                        <Clock className="h-4 w-4 text-gray-600" />
                       </div>
                       <div>
                         <div className="text-sm">
                           You {activity.type}d{" "}
                           <span className="font-medium">{activity.course}</span>
-                          {activity.is_published ? (
-                            <span className="ml-2 text-xs text-green-600">
-                              (Published)
-                            </span>
-                          ) : (
-                            <span className="ml-2 text-xs text-gray-500">
-                              (Draft)
-                            </span>
-                          )}
                         </div>
                         <div className="text-xs text-gray-500">
-                          {activity.time} • {activity.subject}
+                          {activity.time}
                         </div>
                       </div>
                     </div>

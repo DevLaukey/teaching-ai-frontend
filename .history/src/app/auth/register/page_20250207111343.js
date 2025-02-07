@@ -144,7 +144,7 @@ const RegisterPage = () => {
 
         // Store the token if your backend sends one
         if (data.auth_token) {
-          localStorage.setItem("token", data.auth_token);
+\          localStorage.setItem("token", data.auth_token);
         }
 
         // Redirect to dashboard on success

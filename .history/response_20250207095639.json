@@ -1,0 +1,253 @@
+[
+
+  {
+    "order": 1,
+    "title": "Introduction to Botany",
+    "content": "",
+    "font_family": "arial",
+    "font_size": "16",
+    "layout": "default",
+    "presentation": 11,
+    "isTitle": true
+  },
+  {
+    "id": 25,
+    "order": 1,
+    "title": "**Slide 1: \"Introduction to Botany\"**",
+    "content": "",
+    "font_family": "arial",
+    "font_size": "16",
+    "layout": "default",
+    "presentation": 11
+  },
+  {
+    "id": 26,
+    "order": 2,
+    "title": "**Educational Content:** Botany, also referred to as plant science or phytology, is a branch of biology that involves the scientific study of plant life. This discipline encompasses a wide range of topics, including the study of plant structure, growth, differentiation, reproduction, biochemistry, diseases, and plant taxonomy. Importantly, Botany covers not only traditional \"land\" plants, but also algae and fungi.",
+    "content": "",
+    "font_family": "arial",
+    "font_size": "16",
+    "layout": "default",
+    "presentation": 11
+  },
+  {
+    "id": 27,
+    "order": 3,
+    "title": "**Examples:**",
+    "content": "1. Studying the effects of pollution on lichen growth in urban areas is a common application of botany. \n2. Phycology, a subfield of botany, studies seaweed and other algae to understand their physiology and ecology.",
+    "font_family": "arial",
+    "font_size": "16",
+    "layout": "default",
+    "presentation": 11
+  },
+  {
+    "id": 28,
+    "order": 4,
+    "title": "**Interactive Activity:** Ask learners to note down the three main divisions of plants they know.",
+    "content": "",
+    "font_family": "arial",
+    "font_size": "16",
+    "layout": "default",
+    "presentation": 11
+  },
+  {
+    "id": 29,
+    "order": 5,
+    "title": "---",
+    "content": "",
+    "font_family": "arial",
+    "font_size": "16",
+    "layout": "default",
+    "presentation": 11
+  },
+  {
+    "id": 30,
+    "order": 6,
+    "title": "**Slide 2: \"Understanding Plant Structure and Function\"**",
+    "content": "",
+    "font_family": "arial",
+    "font_size": "16",
+    "layout": "default",
+    "presentation": 11
+  },
+  {
+    "id": 31,
+    "order": 7,
+    "title": "**Educational Content:** A fundamental part of botany is understanding the structure and function of plants. This includes studying elements like roots, stems, leaves, and flowers, all critical for plant survival. For example, roots anchor the plant and absorb nutrients and water. Leaves are involved in photosynthesis. Flowers are responsible for plant reproduction.",
+    "content": "",
+    "font_family": "arial",
+    "font_size": "16",
+    "layout": "default",
+    "presentation": 11
+  },
+  {
+    "id": 32,
+    "order": 8,
+    "title": "**Examples:**",
+    "content": "1. In corn plants, the stems, also known as stalks, provide structure and transport nutrients. \n2. The Venus flytrap, a carnivorous plant, has modified leaves that can close rapidly to trap its prey.",
+    "font_family": "arial",
+    "font_size": "16",
+    "layout": "default",
+    "presentation": 11
+  },
+  {
+    "id": 33,
+    "order": 9,
+    "title": "**Interactive Activity:** Encourage students to draw and label the basic parts of a plant.",
+    "content": "",
+    "font_family": "arial",
+    "font_size": "16",
+    "layout": "default",
+    "presentation": 11
+  },
+  {
+    "id": 34,
+    "order": 10,
+    "title": "---",
+    "content": "",
+    "font_family": "arial",
+    "font_size": "16",
+    "layout": "default",
+    "presentation": 11
+  },
+  {
+    "id": 35,
+    "order": 11,
+    "title": "**Slide 3: \"Plant Nutrition and Photosynthesis\"**",
+    "content": "",
+    "font_family": "arial",
+    "font_size": "16",
+    "layout": "default",
+    "presentation": 11
+  },
+  {
+    "id": 36,
+    "order": 12,
+    "title": "**Educational Content:** Plants are autotrophic organisms, meaning they generate their own food. The process of photosynthesis, which occurs in the chloroplasts of plant cells, is central to plant nutrition. In simplified terms, photosynthesis uses water, carbon dioxide, and sunlight to produce glucose, which provides energy, and oxygen.",
+    "content": "",
+    "font_family": "arial",
+    "font_size": "16",
+    "layout": "default",
+    "presentation": 11
+  },
+  {
+    "id": 37,
+    "order": 13,
+    "title": "**Examples:**",
+    "content": "1. Large deciduous trees like the Oak utilize photosynthesis to produce vast amounts of glucose for growth and energy storage.\n2. Algae, although not a traditional plant, still conducts photosynthesis and plays a significant role in global carbon and oxygen cycling.",
+    "font_family": "arial",
+    "font_size": "16",
+    "layout": "default",
+    "presentation": 11
+  },
+  {
+    "id": 38,
+    "order": 14,
+    "title": "**Interactive Activity:** Ask learners to explain why photosynthesis is essential for life on earth.",
+    "content": "",
+    "font_family": "arial",
+    "font_size": "16",
+    "layout": "default",
+    "presentation": 11
+  },
+  {
+    "id": 39,
+    "order": 15,
+    "title": "---",
+    "content": "",
+    "font_family": "arial",
+    "font_size": "16",
+    "layout": "default",
+    "presentation": 11
+  },
+  {
+    "id": 40,
+    "order": 16,
+    "title": "**Slide 4: \"Plant Reproduction and Life Cycle\"**",
+    "content": "",
+    "font_family": "arial",
+    "font_size": "16",
+    "layout": "default",
+    "presentation": 11
+  },
+  {
+    "id": 41,
+    "order": 17,
+    "title": "**Educational Content:** Plants have the unique ability to reproduce both sexually and asexually. Sexual reproduction involves the transfer of pollen from the stamen (male) to the carpel (female) part of a flower. Asexual reproduction involves creating new plants without seeds, usually from plant stems or roots.",
+    "content": "",
+    "font_family": "arial",
+    "font_size": "16",
+    "layout": "default",
+    "presentation": 11
+  },
+  {
+    "id": 42,
+    "order": 18,
+    "title": "**Examples:**",
+    "content": "1. A common example of sexual reproduction is seen in flowering plants such as roses, where bees transfer pollen between flowers.\n2. Potato plants can reproduce asexually through pieces of the tuber, which forms new plants.",
+    "font_family": "arial",
+    "font_size": "16",
+    "layout": "default",
+    "presentation": 11
+  },
+  {
+    "id": 43,
+    "order": 19,
+    "title": "**Interactive Activity:** Ask learners to cite an example of a plant that reproduces sexually and one that reproduces asexually.",
+    "content": "",
+    "font_family": "arial",
+    "font_size": "16",
+    "layout": "default",
+    "presentation": 11
+  },
+  {
+    "id": 44,
+    "order": 20,
+    "title": "---",
+    "content": "",
+    "font_family": "arial",
+    "font_size": "16",
+    "layout": "default",
+    "presentation": 11
+  },
+  {
+    "id": 45,
+    "order": 21,
+    "title": "**Slide 5: \"The Importance of Botany\"**",
+    "content": "",
+    "font_family": "arial",
+    "font_size": "16",
+    "layout": "default",
+    "presentation": 11
+  },
+  {
+    "id": 46,
+    "order": 22,
+    "title": "**Educational Content:** Botany plays an essential role in various areas such as agriculture, forestry, and medicine. Studying and understanding plants can help improve crop yield, develop disease-resistant plant species, discover new medicines, and even help combat climate change.",
+    "content": "",
+    "font_family": "arial",
+    "font_size": "16",
+    "layout": "default",
+    "presentation": 11
+  },
+  {
+    "id": 47,
+    "order": 23,
+    "title": "**Examples:**",
+    "content": "1. In agriculture, botany has helped create high-yielding and disease-resistant crops.\n2. The study of plant compounds led to the discovery of drugs like aspirin and quinine.",
+    "font_family": "arial",
+    "font_size": "16",
+    "layout": "default",
+    "presentation": 11
+  },
+  {
+    "id": 48,
+    "order": 24,
+    "title": "**Interactive Activity:** Ask learners to discuss how plant study can contribute to climate change mitigation.",
+    "content": "",
+    "font_family": "arial",
+    "font_size": "16",
+    "layout": "default",
+    "presentation": 11
+  }
+]

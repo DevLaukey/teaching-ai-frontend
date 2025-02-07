@@ -70,9 +70,9 @@ const ContentPreview = () => {
           id: slide.order,
           title: slide.title,
           content: slide.content,
-          fontFamily: slide.fontFamily,
-          fontSize: slide.fontSize,
-          layout: slide.layout,
+          fontFamily: slide.style.fontFamily,
+          fontSize: slide.style.fontSize,
+          layout: slide.style.layout,
           comments: [],
           images: [],
         }));
