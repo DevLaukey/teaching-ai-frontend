@@ -136,6 +136,7 @@ const CourseFinalization = () => {
     return formattedSlides;
   };
 
+
   const exportToPPTX = async () => {
     if (isExporting) return;
     setIsExporting(true);
@@ -270,6 +271,7 @@ const CourseFinalization = () => {
     }
   };
 
+  
   const exportToDOCX = async () => {
     if (isExporting) return;
     setIsExporting(true);

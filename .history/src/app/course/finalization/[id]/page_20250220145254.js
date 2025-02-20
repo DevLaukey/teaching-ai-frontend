@@ -136,139 +136,97 @@ const CourseFinalization = () => {
     return formattedSlides;
   };
 
-  const exportToPPTX = async () => {
-    if (isExporting) return;
-    setIsExporting(true);
+const exportToPPTX = async () => {
+  if (isExporting) return;
+  setIsExporting(true);
 
-    try {
-      const formattedSlides = formatSlidesForExport();
-      const pptx = new Pptxgen();
+  try {
+    const formattedSlides = formatSlidesForExport();
+    const pptx = new Pptxgen();
 
-      // Set presentation properties
-      pptx.author = "EduAI";
-      pptx.title = courseData.title;
+    // Set presentation properties
+    pptx.author = "EduAI";
+    pptx.title = courseData.title;
 
-      // Create title slide
-      let titleSlide = pptx.addSlide();
-      titleSlide.addText(courseData.title, {
-        x: "10%",
-        y: "40%",
-        w: "80%",
-        fontSize: 44,
+    // Create title slide
+    const titleSlide = pptx.addSlide();
+    titleSlide.addText(courseData.title, {
+      x: "10%",
+      y: "40%",
+      w: "80%",
+      fontSize: 44,
+      bold: true,
+      align: "center",
+    });
+
+    // Create content slides
+    formattedSlides.forEach((slide) => {
+      const pptSlide = pptx.addSlide();
+
+      // Add title
+      pptSlide.addText(slide.title, {
+        x: "5%",
+        y: "5%",
+        w: "90%",
+        fontSize: 32,
         bold: true,
-        align: "center",
       });
 
-      // Create content slides
-      formattedSlides.forEach((slide) => {
-        let currentSlide = pptx.addSlide();
+      // Add content
+      if (slide.content.length > 0) {
+        // Add each content point separately
+        slide.content.forEach((point, index) => {
+          pptSlide.addText(point, {
+            x: "5%",
+            y: `${25 + index * 10}%`,
+            w: "90%",
+            fontSize: 18,
+            bullet: true,
+          });
+        });
+      }
 
-        // Add title
-        currentSlide.addText(slide.title, {
+      // Add examples if present
+      if (slide.examples.length > 0) {
+        pptSlide.addText("Examples:", {
           x: "5%",
-          y: "5%",
+          y: "60%",
           w: "90%",
-          fontSize: 32,
+          fontSize: 18,
           bold: true,
         });
 
-        // Add content
-        if (slide.content.length > 0) {
-          const baseY = 25; // Starting Y position
-          let currentY = baseY;
-
-          // Add each content point separately
-          slide.content.forEach((point, index) => {
-            const estimatedLines = Math.ceil((point.length * 18) / 800);
-            const heightNeeded = estimatedLines * 1.2;
-
-            currentSlide.addText(point, {
-              x: "5%",
-              y: `${currentY}%`,
-              w: "90%",
-              h: `${heightNeeded}%`,
-              fontSize: 18,
-              bullet: true,
-              breakLine: true,
-              autoFit: true,
-              align: "left",
-              valign: "top",
-            });
-
-            currentY += Math.max(heightNeeded + 2, 8);
-          });
-        }
-
-        // Add examples if present
-        if (slide.examples.length > 0) {
-          const lastContentY =
-            slide.content.length > 0
-              ? Math.min(25 + slide.content.length * 15, 60)
-              : 60;
-
-          currentSlide.addText("Examples:", {
+        // Add each example separately
+        slide.examples.forEach((example, index) => {
+          pptSlide.addText(example, {
             x: "5%",
-            y: `${lastContentY}%`,
+            y: `${70 + index * 10}%`,
             w: "90%",
-            fontSize: 18,
-            bold: true,
-            margin: 5,
+            fontSize: 16,
+            bullet: true,
           });
+        });
+      }
+    });
 
-          let currentY = lastContentY + 10;
+    // Save the presentation
+    await pptx.writeFile(`${courseData.title.replace(/\s+/g, "_")}.pptx`);
 
-          slide.examples.forEach((example, index) => {
-            if (currentY > 90 && index < slide.examples.length - 1) {
-              currentSlide = pptx.addSlide();
-              currentSlide.addText(`${slide.title} (continued)`, {
-                x: "5%",
-                y: "5%",
-                w: "90%",
-                fontSize: 32,
-                bold: true,
-              });
-              currentY = 25;
-            }
-
-            const estimatedLines = Math.ceil((example.length * 16) / 800);
-            const heightNeeded = estimatedLines * 1.2;
-
-            currentSlide.addText(example, {
-              x: "5%",
-              y: `${currentY}%`,
-              w: "90%",
-              h: `${heightNeeded}%`,
-              fontSize: 16,
-              bullet: true,
-              breakLine: true,
-              autoFit: true,
-              align: "left",
-              valign: "top",
-            });
-
-            currentY += Math.max(heightNeeded + 2, 6);
-          });
-        }
-      });
-
-      // Save the presentation
-      await pptx.writeFile(`${courseData.title.replace(/\s+/g, "_")}.pptx`);
-
-      toast({
-        title: "Success",
-        description: "Course exported to PowerPoint successfully",
-      });
-    } catch (error) {
-      console.error("PPTX export error:", error);
-      toast({
-        title: "Error",
-        description: "Failed to export to PowerPoint",
-        variant: "destructive",
-      });
-    } finally {
-      setIsExporting(false);
-    }
-  };
+    toast({
+      title: "Success",
+      description: "Course exported to PowerPoint successfully",
+    });
+  } catch (error) {
+    console.error("PPTX export error:", error);
+    toast({
+      title: "Error",
+      description: "Failed to export to PowerPoint",
+      variant: "destructive",
+    });
+  } finally {
+    setIsExporting(false);
+  }
+};
 
   const exportToDOCX = async () => {
     if (isExporting) return;

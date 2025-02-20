@@ -135,7 +135,8 @@ const CourseFinalization = () => {
 
     return formattedSlides;
   };
-
+ 
+  
   const exportToPPTX = async () => {
     if (isExporting) return;
     setIsExporting(true);
@@ -149,7 +150,7 @@ const CourseFinalization = () => {
       pptx.title = courseData.title;
 
       // Create title slide
-      let titleSlide = pptx.addSlide();
+      const titleSlide = pptx.addSlide();
       titleSlide.addText(courseData.title, {
         x: "10%",
         y: "40%",
@@ -161,10 +162,10 @@ const CourseFinalization = () => {
 
       // Create content slides
       formattedSlides.forEach((slide) => {
-        let currentSlide = pptx.addSlide();
+        const pptSlide = pptx.addSlide();
 
         // Add title
-        currentSlide.addText(slide.title, {
+        pptSlide.addText(slide.title, {
           x: "5%",
           y: "5%",
           w: "90%",
@@ -174,80 +175,37 @@ const CourseFinalization = () => {
 
         // Add content
         if (slide.content.length > 0) {
-          const baseY = 25; // Starting Y position
-          let currentY = baseY;
-
           // Add each content point separately
           slide.content.forEach((point, index) => {
-            const estimatedLines = Math.ceil((point.length * 18) / 800);
-            const heightNeeded = estimatedLines * 1.2;
-
-            currentSlide.addText(point, {
+            pptSlide.addText(point, {
               x: "5%",
-              y: `${currentY}%`,
+              y: `${25 + index * 10}%`,
               w: "90%",
-              h: `${heightNeeded}%`,
               fontSize: 18,
               bullet: true,
-              breakLine: true,
-              autoFit: true,
-              align: "left",
-              valign: "top",
             });
-
-            currentY += Math.max(heightNeeded + 2, 8);
           });
         }
 
         // Add examples if present
         if (slide.examples.length > 0) {
-          const lastContentY =
-            slide.content.length > 0
-              ? Math.min(25 + slide.content.length * 15, 60)
-              : 60;
-
-          currentSlide.addText("Examples:", {
+          pptSlide.addText("Examples:", {
             x: "5%",
-            y: `${lastContentY}%`,
+            y: "60%",
             w: "90%",
             fontSize: 18,
             bold: true,
-            margin: 5,
           });
-
-          let currentY = lastContentY + 10;
-
-          slide.examples.forEach((example, index) => {
-            if (currentY > 90 && index < slide.examples.length - 1) {
-              currentSlide = pptx.addSlide();
-              currentSlide.addText(`${slide.title} (continued)`, {
-                x: "5%",
-                y: "5%",
-                w: "90%",
-                fontSize: 32,
-                bold: true,
-              });
-              currentY = 25;
-            }
-
-            const estimatedLines = Math.ceil((example.length * 16) / 800);
-            const heightNeeded = estimatedLines * 1.2;
-
-            currentSlide.addText(example, {
+          pptSlide.addText(
+            slide.examples.map((ex) => `• ${ex}`),
+            {
               x: "5%",
-              y: `${currentY}%`,
+              y: "70%",
               w: "90%",
-              h: `${heightNeeded}%`,
               fontSize: 16,
               bullet: true,
-              breakLine: true,
-              autoFit: true,
-              align: "left",
-              valign: "top",
-            });
-
-            currentY += Math.max(heightNeeded + 2, 6);
-          });
+            }
+          );
         }
       });
 
@@ -270,187 +228,189 @@ const CourseFinalization = () => {
     }
   };
 
-  const exportToDOCX = async () => {
-    if (isExporting) return;
-    setIsExporting(true);
+const exportToDOCX = async () => {
+  if (isExporting) return;
+  setIsExporting(true);
 
-    try {
-      const formattedSlides = formatSlidesForExport();
+  try {
+    const formattedSlides = formatSlidesForExport();
 
-      const doc = new Document({
-        sections: [
-          {
-            properties: {},
-            children: [
+    const doc = new Document({
+      sections: [
+        {
+          properties: {},
+          children: [
+            new Paragraph({
+              text: courseData.title,
+              heading: HeadingLevel.TITLE,
+            }),
+            new Paragraph({
+              text: `Generated on: ${new Date().toLocaleDateString()}`,
+              spacing: {
+                after: 500,
+              },
+            }),
+            ...formattedSlides.flatMap((slide, index) => [
               new Paragraph({
-                text: courseData.title,
-                heading: HeadingLevel.TITLE,
-              }),
-              new Paragraph({
-                text: `Generated on: ${new Date().toLocaleDateString()}`,
+                text: `Chapter ${index + 1}: ${slide.title}`,
+                heading: HeadingLevel.HEADING_1,
                 spacing: {
-                  after: 500,
+                  before: 400,
+                  after: 200,
                 },
               }),
-              ...formattedSlides.flatMap((slide, index) => [
-                new Paragraph({
-                  text: `Chapter ${index + 1}: ${slide.title}`,
-                  heading: HeadingLevel.HEADING_1,
-                  spacing: {
-                    before: 400,
-                    after: 200,
-                  },
-                }),
-                ...slide.content.map(
-                  (content) =>
-                    new Paragraph({
-                      children: [
-                        new TextRun({
-                          text: content,
-                        }),
-                      ],
-                      spacing: {
-                        after: 200,
-                      },
-                    })
-                ),
-                ...(slide.examples.length > 0
-                  ? [
-                      new Paragraph({
-                        text: "Examples:",
-                        heading: HeadingLevel.HEADING_2,
+              ...slide.content.map(
+                (content) =>
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: content,
                       }),
-                      ...slide.examples.map(
-                        (example, i) =>
-                          new Paragraph({
-                            text: `${i + 1}. ${example}`,
-                            spacing: {
-                              after: 200,
-                            },
-                          })
-                      ),
-                    ]
-                  : []),
-              ]),
-            ],
-          },
-        ],
-      });
+                    ],
+                    spacing: {
+                      after: 200,
+                    },
+                  })
+              ),
+              ...(slide.examples.length > 0
+                ? [
+                    new Paragraph({
+                      text: "Examples:",
+                      heading: HeadingLevel.HEADING_2,
+                    }),
+                    ...slide.examples.map(
+                      (example, i) =>
+                        new Paragraph({
+                          text: `${i + 1}. ${example}`,
+                          spacing: {
+                            after: 200,
+                          },
+                        })
+                    ),
+                  ]
+                : []),
+            ]),
+          ],
+        },
+      ],
+    });
 
-      // Generate and save the document
-      const buffer = await Packer.toBuffer(doc);
-      const blob = new Blob([buffer], {
-        type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${courseData.title.replace(/\s+/g, "_")}.docx`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
+    // Generate and save the document
+    const buffer = await Packer.toBuffer(doc);
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${courseData.title.replace(/\s+/g, "_")}.docx`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
 
-      toast({
-        title: "Success",
-        description: "Course exported to Word document successfully",
-      });
-    } catch (error) {
-      console.error("DOCX export error:", error);
-      toast({
-        title: "Error",
-        description: "Failed to export to Word document",
-        variant: "destructive",
-      });
-    } finally {
-      setIsExporting(false);
-    }
-  };
+    toast({
+      title: "Success",
+      description: "Course exported to Word document successfully",
+    });
+  } catch (error) {
+    console.error("DOCX export error:", error);
+    toast({
+      title: "Error",
+      description: "Failed to export to Word document",
+      variant: "destructive",
+    });
+  } finally {
+    setIsExporting(false);
+  }
+};
 
-  const exportToPDF = async () => {
-    if (isExporting) return;
-    setIsExporting(true);
+const exportToPDF = async () => {
+  if (isExporting) return;
+  setIsExporting(true);
 
-    try {
-      const formattedSlides = formatSlidesForExport();
-      const pdf = new jsPDF();
-      let yOffset = 20;
+  try {
+    const formattedSlides = formatSlidesForExport();
+    const pdf = new jsPDF();
+    let yOffset = 20;
 
-      // Add title
-      pdf.setFontSize(24);
-      pdf.text(courseData.title, 20, yOffset);
-      yOffset += 20;
+    // Add title
+    pdf.setFontSize(24);
+    pdf.text(courseData.title, 20, yOffset);
+    yOffset += 20;
 
-      // Add generation date
+    // Add generation date
+    pdf.setFontSize(12);
+    pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, yOffset);
+    yOffset += 20;
+
+    formattedSlides.forEach((slide, index) => {
+      // Add page break if needed
+      if (yOffset > 250) {
+        pdf.addPage();
+        yOffset = 20;
+      }
+
+      // Add slide title
+      pdf.setFontSize(18);
+      pdf.text(`Chapter ${index + 1}: ${slide.title}`, 20, yOffset);
+      yOffset += 15;
+
+      // Add content
       pdf.setFontSize(12);
-      pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, yOffset);
-      yOffset += 20;
-
-      formattedSlides.forEach((slide, index) => {
-        // Add page break if needed
-        if (yOffset > 250) {
-          pdf.addPage();
-          yOffset = 20;
-        }
-
-        // Add slide title
-        pdf.setFontSize(18);
-        pdf.text(`Chapter ${index + 1}: ${slide.title}`, 20, yOffset);
-        yOffset += 15;
-
-        // Add content
-        pdf.setFontSize(12);
-        slide.content.forEach((content) => {
-          // Split long text into multiple lines
-          const lines = pdf.splitTextToSize(content, 170);
-          lines.forEach((line) => {
-            if (yOffset > 280) {
-              pdf.addPage();
-              yOffset = 20;
-            }
-            pdf.text(line, 20, yOffset);
-            yOffset += 10;
-          });
+      slide.content.forEach((content) => {
+        // Split long text into multiple lines
+        const lines = pdf.splitTextToSize(content, 170);
+        lines.forEach((line) => {
+          if (yOffset > 280) {
+            pdf.addPage();
+            yOffset = 20;
+          }
+          pdf.text(line, 20, yOffset);
+          yOffset += 10;
         });
+      });
 
-        // Add examples if present
-        if (slide.examples.length > 0) {
+      // Add examples if present
+      if (slide.examples.length > 0) {
+        yOffset += 10;
+        pdf.setFontSize(14);
+        pdf.text("Examples:", 20, yOffset);
+        yOffset += 10;
+        pdf.setFontSize(12);
+        slide.examples.forEach((example, i) => {
+          if (yOffset > 280) {
+            pdf.addPage();
+            yOffset = 20;
+          }
+          pdf.text(`${i + 1}. ${example}`, 25, yOffset);
           yOffset += 10;
-          pdf.setFontSize(14);
-          pdf.text("Examples:", 20, yOffset);
-          yOffset += 10;
-          pdf.setFontSize(12);
-          slide.examples.forEach((example, i) => {
-            if (yOffset > 280) {
-              pdf.addPage();
-              yOffset = 20;
-            }
-            pdf.text(`${i + 1}. ${example}`, 25, yOffset);
-            yOffset += 10;
-          });
-        }
+        });
+      }
 
-        yOffset += 20;
-      });
+      yOffset += 20;
+    });
 
-      // Save the PDF
-      pdf.save(`${courseData.title.replace(/\s+/g, "_")}.pdf`);
+    // Save the PDF
+    pdf.save(`${courseData.title.replace(/\s+/g, "_")}.pdf`);
 
-      toast({
-        title: "Success",
-        description: "Course exported to PDF successfully",
-      });
-    } catch (error) {
-      console.error("PDF export error:", error);
-      toast({
-        title: "Error",
-        description: "Failed to export to PDF",
-        variant: "destructive",
-      });
-    } finally {
-      setIsExporting(false);
-    }
-  };
+    toast({
+      title: "Success",
+      description: "Course exported to PDF successfully",
+    });
+  } catch (error) {
+    console.error("PDF export error:", error);
+    toast({
+      title: "Error",
+      description: "Failed to export to PDF",
+      variant: "destructive",
+    });
+  } finally {
+    setIsExporting(false);
+  }
+};
+
+
 
   const handleFinalizeCourse = () => {
     router.push(`/community/`);

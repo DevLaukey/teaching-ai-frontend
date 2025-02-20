@@ -136,6 +136,44 @@ const CourseFinalization = () => {
     return formattedSlides;
   };
 
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { useToast } from "@/hooks/use-toast";
+import {
+  ArrowLeft,
+  Download,
+  FileDown,
+  File,
+  FileText,
+  Book,
+  BarChart,
+  Check,
+} from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import Pptxgen from 'pptxgenjs';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel } from 'docx';
+import { jsPDF } from 'jspdf';
+
+const CourseFinalization = () => {
+  // ... (keep existing state and hooks)
+
   const exportToPPTX = async () => {
     if (isExporting) return;
     setIsExporting(true);
@@ -145,108 +183,115 @@ const CourseFinalization = () => {
       const pptx = new Pptxgen();
 
       // Set presentation properties
-      pptx.author = "EduAI";
+      pptx.author = 'EduAI';
       pptx.title = courseData.title;
 
       // Create title slide
-      let titleSlide = pptx.addSlide();
+      const titleSlide = pptx.addSlide();
       titleSlide.addText(courseData.title, {
-        x: "10%",
-        y: "40%",
-        w: "80%",
+        x: '10%',
+        y: '40%',
+        w: '80%',
         fontSize: 44,
         bold: true,
-        align: "center",
+        align: 'center',
       });
 
       // Create content slides
       formattedSlides.forEach((slide) => {
-        let currentSlide = pptx.addSlide();
+        const pptSlide = pptx.addSlide();
 
         // Add title
-        currentSlide.addText(slide.title, {
-          x: "5%",
-          y: "5%",
-          w: "90%",
+        pptSlide.addText(slide.title, {
+          x: '5%',
+          y: '5%',
+          w: '90%',
           fontSize: 32,
           bold: true,
         });
 
         // Add content
         if (slide.content.length > 0) {
-          const baseY = 25; // Starting Y position
+          // Calculate appropriate spacing based on content length
+          const baseY = 25;  // Starting Y position
           let currentY = baseY;
-
+          
           // Add each content point separately
           slide.content.forEach((point, index) => {
-            const estimatedLines = Math.ceil((point.length * 18) / 800);
-            const heightNeeded = estimatedLines * 1.2;
-
-            currentSlide.addText(point, {
-              x: "5%",
+            // Estimate number of lines needed (rough calculation based on characters and width)
+            const estimatedLines = Math.ceil((point.length * 18) / 800);  // fontSize * chars / slide width
+            const heightNeeded = estimatedLines * 1.2;  // 1.2 line spacing
+            
+            pptSlide.addText(point, {
+              x: '5%',
               y: `${currentY}%`,
-              w: "90%",
+              w: '90%',
               h: `${heightNeeded}%`,
               fontSize: 18,
               bullet: true,
               breakLine: true,
               autoFit: true,
-              align: "left",
-              valign: "top",
+              align: 'left',
+              valign: 'top'
             });
-
-            currentY += Math.max(heightNeeded + 2, 8);
+            
+            // Update Y position for next item, with minimum spacing
+            currentY += Math.max(heightNeeded + 2, 8);  // At least 2% padding, minimum 8% total spacing
           });
         }
 
         // Add examples if present
         if (slide.examples.length > 0) {
-          const lastContentY =
-            slide.content.length > 0
-              ? Math.min(25 + slide.content.length * 15, 60)
-              : 60;
-
-          currentSlide.addText("Examples:", {
-            x: "5%",
+          // Find the last Y position from content section or use default
+          const lastContentY = slide.content.length > 0 
+            ? Math.min(25 + (slide.content.length * 15), 60)  // Cap at 60%
+            : 60;
+            
+          pptSlide.addText('Examples:', {
+            x: '5%',
             y: `${lastContentY}%`,
-            w: "90%",
+            w: '90%',
             fontSize: 18,
             bold: true,
-            margin: 5,
+            margin: 5
           });
-
-          let currentY = lastContentY + 10;
-
+          
+          let currentY = lastContentY + 10;  // Start examples below header
+          
+          // Add each example separately
           slide.examples.forEach((example, index) => {
-            if (currentY > 90 && index < slide.examples.length - 1) {
-              currentSlide = pptx.addSlide();
-              currentSlide.addText(`${slide.title} (continued)`, {
-                x: "5%",
-                y: "5%",
-                w: "90%",
-                fontSize: 32,
-                bold: true,
-              });
-              currentY = 25;
-            }
-
+            // Estimate lines needed for this example
             const estimatedLines = Math.ceil((example.length * 16) / 800);
             const heightNeeded = estimatedLines * 1.2;
-
-            currentSlide.addText(example, {
-              x: "5%",
+            
+            pptSlide.addText(example, {
+              x: '5%',
               y: `${currentY}%`,
-              w: "90%",
+              w: '90%',
               h: `${heightNeeded}%`,
               fontSize: 16,
               bullet: true,
               breakLine: true,
               autoFit: true,
-              align: "left",
-              valign: "top",
+              align: 'left',
+              valign: 'top'
             });
-
+            
+            // Update Y position for next example
             currentY += Math.max(heightNeeded + 2, 6);
+            
+            // Add new slide if we're running out of space
+            if (currentY > 90 && index < slide.examples.length - 1) {
+              pptSlide = pptx.addSlide();
+              pptSlide.addText(`${slide.title} (continued)`, {
+                x: '5%',
+                y: '5%',
+                w: '90%',
+                fontSize: 32,
+                bold: true,
+              });
+              currentY = 25;  // Reset Y position on new slide
+            }
           });
         }
       });

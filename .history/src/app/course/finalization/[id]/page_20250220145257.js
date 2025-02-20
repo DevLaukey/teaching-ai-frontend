@@ -149,7 +149,7 @@ const CourseFinalization = () => {
       pptx.title = courseData.title;
 
       // Create title slide
-      let titleSlide = pptx.addSlide();
+      const titleSlide = pptx.addSlide();
       titleSlide.addText(courseData.title, {
         x: "10%",
         y: "40%",
@@ -161,10 +161,10 @@ const CourseFinalization = () => {
 
       // Create content slides
       formattedSlides.forEach((slide) => {
-        let currentSlide = pptx.addSlide();
+        const pptSlide = pptx.addSlide();
 
         // Add title
-        currentSlide.addText(slide.title, {
+        pptSlide.addText(slide.title, {
           x: "5%",
           y: "5%",
           w: "90%",
@@ -174,79 +174,37 @@ const CourseFinalization = () => {
 
         // Add content
         if (slide.content.length > 0) {
-          const baseY = 25; // Starting Y position
-          let currentY = baseY;
-
           // Add each content point separately
           slide.content.forEach((point, index) => {
-            const estimatedLines = Math.ceil((point.length * 18) / 800);
-            const heightNeeded = estimatedLines * 1.2;
-
-            currentSlide.addText(point, {
+            pptSlide.addText(point, {
               x: "5%",
-              y: `${currentY}%`,
+              y: `${25 + index * 10}%`,
               w: "90%",
-              h: `${heightNeeded}%`,
               fontSize: 18,
               bullet: true,
-              breakLine: true,
-              autoFit: true,
-              align: "left",
-              valign: "top",
             });
-
-            currentY += Math.max(heightNeeded + 2, 8);
           });
         }
 
         // Add examples if present
         if (slide.examples.length > 0) {
-          const lastContentY =
-            slide.content.length > 0
-              ? Math.min(25 + slide.content.length * 15, 60)
-              : 60;
-
-          currentSlide.addText("Examples:", {
+          pptSlide.addText("Examples:", {
             x: "5%",
-            y: `${lastContentY}%`,
+            y: "60%",
             w: "90%",
             fontSize: 18,
             bold: true,
-            margin: 5,
           });
 
-          let currentY = lastContentY + 10;
-
+          // Add each example separately
           slide.examples.forEach((example, index) => {
-            if (currentY > 90 && index < slide.examples.length - 1) {
-              currentSlide = pptx.addSlide();
-              currentSlide.addText(`${slide.title} (continued)`, {
-                x: "5%",
-                y: "5%",
-                w: "90%",
-                fontSize: 32,
-                bold: true,
-              });
-              currentY = 25;
-            }
-
-            const estimatedLines = Math.ceil((example.length * 16) / 800);
-            const heightNeeded = estimatedLines * 1.2;
-
-            currentSlide.addText(example, {
+            pptSlide.addText(example, {
               x: "5%",
-              y: `${currentY}%`,
+              y: `${70 + index * 10}%`,
               w: "90%",
-              h: `${heightNeeded}%`,
               fontSize: 16,
               bullet: true,
-              breakLine: true,
-              autoFit: true,
-              align: "left",
-              valign: "top",
             });
-
-            currentY += Math.max(heightNeeded + 2, 6);
           });
         }
       });

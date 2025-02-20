@@ -136,139 +136,147 @@ const CourseFinalization = () => {
     return formattedSlides;
   };
 
-  const exportToPPTX = async () => {
-    if (isExporting) return;
-    setIsExporting(true);
+const exportToPPTX = async () => {
+  if (isExporting) return;
+  setIsExporting(true);
 
-    try {
-      const formattedSlides = formatSlidesForExport();
-      const pptx = new Pptxgen();
+  try {
+    const formattedSlides = formatSlidesForExport();
+    const pptx = new Pptxgen();
 
-      // Set presentation properties
-      pptx.author = "EduAI";
-      pptx.title = courseData.title;
+    // Set presentation properties
+    pptx.author = "EduAI";
+    pptx.title = courseData.title;
 
-      // Create title slide
-      let titleSlide = pptx.addSlide();
-      titleSlide.addText(courseData.title, {
-        x: "10%",
-        y: "40%",
-        w: "80%",
-        fontSize: 44,
+    // Create title slide
+    const titleSlide = pptx.addSlide();
+    titleSlide.addText(courseData.title, {
+      x: "10%",
+      y: "40%",
+      w: "80%",
+      fontSize: 44,
+      bold: true,
+      align: "center",
+    });
+
+    // Create content slides
+    formattedSlides.forEach((slide) => {
+      const pptSlide = pptx.addSlide();
+
+      // Add title
+      pptSlide.addText(slide.title, {
+        x: "5%",
+        y: "5%",
+        w: "90%",
+        fontSize: 32,
         bold: true,
-        align: "center",
       });
 
-      // Create content slides
-      formattedSlides.forEach((slide) => {
-        let currentSlide = pptx.addSlide();
+      // Add content
+      if (slide.content.length > 0) {
+        // Calculate appropriate spacing based on content length
+        const baseY = 25; // Starting Y position
+        let currentY = baseY;
 
-        // Add title
-        currentSlide.addText(slide.title, {
+        // Add each content point separately
+        slide.content.forEach((point, index) => {
+          // Estimate number of lines needed (rough calculation based on characters and width)
+          const estimatedLines = Math.ceil((point.length * 18) / 800); // fontSize * chars / slide width
+          const heightNeeded = estimatedLines * 1.2; // 1.2 line spacing
+
+          pptSlide.addText(point, {
+            x: "5%",
+            y: `${currentY}%`,
+            w: "90%",
+            h: `${heightNeeded}%`,
+            fontSize: 18,
+            bullet: true,
+            breakLine: true,
+            autoFit: true,
+            align: "left",
+            valign: "top",
+          });
+
+          // Update Y position for next item, with minimum spacing
+          currentY += Math.max(heightNeeded + 2, 8); // At least 2% padding, minimum 8% total spacing
+        });
+      }
+
+      // Add examples if present
+      if (slide.examples.length > 0) {
+        // Find the last Y position from content section or use default
+        const lastContentY =
+          slide.content.length > 0
+            ? Math.min(25 + slide.content.length * 15, 60) // Cap at 60%
+            : 60;
+
+        pptSlide.addText("Examples:", {
           x: "5%",
-          y: "5%",
+          y: `${lastContentY}%`,
           w: "90%",
-          fontSize: 32,
+          fontSize: 18,
           bold: true,
+          margin: 5,
         });
 
-        // Add content
-        if (slide.content.length > 0) {
-          const baseY = 25; // Starting Y position
-          let currentY = baseY;
+        let currentY = lastContentY + 10; // Start examples below header
 
-          // Add each content point separately
-          slide.content.forEach((point, index) => {
-            const estimatedLines = Math.ceil((point.length * 18) / 800);
-            const heightNeeded = estimatedLines * 1.2;
+        // Add each example separately
+        slide.examples.forEach((example, index) => {
+          // Estimate lines needed for this example
+          const estimatedLines = Math.ceil((example.length * 16) / 800);
+          const heightNeeded = estimatedLines * 1.2;
 
-            currentSlide.addText(point, {
-              x: "5%",
-              y: `${currentY}%`,
-              w: "90%",
-              h: `${heightNeeded}%`,
-              fontSize: 18,
-              bullet: true,
-              breakLine: true,
-              autoFit: true,
-              align: "left",
-              valign: "top",
-            });
-
-            currentY += Math.max(heightNeeded + 2, 8);
-          });
-        }
-
-        // Add examples if present
-        if (slide.examples.length > 0) {
-          const lastContentY =
-            slide.content.length > 0
-              ? Math.min(25 + slide.content.length * 15, 60)
-              : 60;
-
-          currentSlide.addText("Examples:", {
+          pptSlide.addText(example, {
             x: "5%",
-            y: `${lastContentY}%`,
+            y: `${currentY}%`,
             w: "90%",
-            fontSize: 18,
-            bold: true,
-            margin: 5,
+            h: `${heightNeeded}%`,
+            fontSize: 16,
+            bullet: true,
+            breakLine: true,
+            autoFit: true,
+            align: "left",
+            valign: "top",
           });
 
-          let currentY = lastContentY + 10;
+          // Update Y position for next example
+          currentY += Math.max(heightNeeded + 2, 6);
 
-          slide.examples.forEach((example, index) => {
-            if (currentY > 90 && index < slide.examples.length - 1) {
-              currentSlide = pptx.addSlide();
-              currentSlide.addText(`${slide.title} (continued)`, {
-                x: "5%",
-                y: "5%",
-                w: "90%",
-                fontSize: 32,
-                bold: true,
-              });
-              currentY = 25;
-            }
-
-            const estimatedLines = Math.ceil((example.length * 16) / 800);
-            const heightNeeded = estimatedLines * 1.2;
-
-            currentSlide.addText(example, {
+          // Add new slide if we're running out of space
+          if (currentY > 90 && index < slide.examples.length - 1) {
+            pptSlide = pptx.addSlide();
+            pptSlide.addText(`${slide.title} (continued)`, {
               x: "5%",
-              y: `${currentY}%`,
+              y: "5%",
               w: "90%",
-              h: `${heightNeeded}%`,
-              fontSize: 16,
-              bullet: true,
-              breakLine: true,
-              autoFit: true,
-              align: "left",
-              valign: "top",
+              fontSize: 32,
+              bold: true,
             });
+            currentY = 25; // Reset Y position on new slide
+          }
+        });
+      }
+    });
 
-            currentY += Math.max(heightNeeded + 2, 6);
-          });
-        }
-      });
+    // Save the presentation
+    await pptx.writeFile(`${courseData.title.replace(/\s+/g, "_")}.pptx`);
 
-      // Save the presentation
-      await pptx.writeFile(`${courseData.title.replace(/\s+/g, "_")}.pptx`);
-
-      toast({
-        title: "Success",
-        description: "Course exported to PowerPoint successfully",
-      });
-    } catch (error) {
-      console.error("PPTX export error:", error);
-      toast({
-        title: "Error",
-        description: "Failed to export to PowerPoint",
-        variant: "destructive",
-      });
-    } finally {
-      setIsExporting(false);
-    }
-  };
+    toast({
+      title: "Success",
+      description: "Course exported to PowerPoint successfully",
+    });
+  } catch (error) {
+    console.error("PPTX export error:", error);
+    toast({
+      title: "Error",
+      description: "Failed to export to PowerPoint",
+      variant: "destructive",
+    });
+  } finally {
+    setIsExporting(false);
+  }
+};
 
   const exportToDOCX = async () => {
     if (isExporting) return;
