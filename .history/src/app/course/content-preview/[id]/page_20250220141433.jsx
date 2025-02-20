@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,13 +18,6 @@ import {
   Type,
   Layout,
   PlusCircle,
-  Undo,
-  Redo,
-  Stars,
-  MessageSquare,
-  ThumbsUp,
-  ThumbsDown,
-  Trash2,
   CheckCircle,
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
@@ -38,12 +30,8 @@ const ContentPreview = () => {
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [slides, setSlides] = useState([]);
-  const [history, setHistory] = useState([]);
-  const [currentHistoryIndex, setCurrentHistoryIndex] = useState(-1);
-
   const token = localStorage.getItem("token");
 
-  // Process raw slides into grouped format
   const processSlides = (rawSlides) => {
     const processedSlides = [];
     let currentSlide = {
@@ -116,7 +104,7 @@ const ContentPreview = () => {
       }
     }
 
-    // Add the last slide
+    // Don't forget to add the last slide
     if (currentSlide.id) {
       processedSlides.push(currentSlide);
     }
@@ -124,85 +112,51 @@ const ContentPreview = () => {
     return processedSlides;
   };
 
-  // Convert processed slides back to API format
-  const convertToApiFormat = (processedSlides) => {
-    const apiSlides = [];
-    let order = 1;
+  // Parse slide content into sections
+  const parseSlideContent = (slide) => {
+    const sections = {
+      title: "",
+      content: "",
+      examples: "",
+      interactive: "",
+    };
 
-    for (const slide of processedSlides) {
-      // Add slide title
-      apiSlides.push({
-        id: slide.id,
-        order: order++,
-        title: `**Slide ${apiSlides.length + 1}**`,
-        content: `Title: ${slide.title}`,
-        font_family: slide.fontFamily,
-        font_size: slide.fontSize,
-        layout: slide.layout,
-        presentation: slide.presentation,
-      });
-
-      // Add main content split into paragraphs
-      const contentParagraphs = slide.mainContent
-        .split("\n")
-        .filter((p) => p.trim());
-      for (const paragraph of contentParagraphs) {
-        apiSlides.push({
-          id: Date.now() + Math.random(),
-          order: order++,
-          title: `Content: ${paragraph}`,
-          content: "",
-          font_family: slide.fontFamily,
-          font_size: slide.fontSize,
-          layout: slide.layout,
-          presentation: slide.presentation,
-        });
-      }
-
-      // Add examples if present
-      if (slide.examples) {
-        apiSlides.push({
-          id: Date.now() + Math.random(),
-          order: order++,
-          title: "Examples:",
-          content: slide.examples,
-          font_family: slide.fontFamily,
-          font_size: slide.fontSize,
-          layout: slide.layout,
-          presentation: slide.presentation,
-        });
-      }
-
-      // Add interactive activity if present
-      if (slide.interactiveActivity) {
-        apiSlides.push({
-          id: Date.now() + Math.random(),
-          order: order++,
-          title: `Interactive activity: ${slide.interactiveActivity}`,
-          content: "",
-          font_family: slide.fontFamily,
-          font_size: slide.fontSize,
-          layout: slide.layout,
-          presentation: slide.presentation,
-        });
-      }
-
-      // Add divider except for last slide
-      if (processedSlides.indexOf(slide) < processedSlides.length - 1) {
-        apiSlides.push({
-          id: Date.now() + Math.random(),
-          order: order++,
-          title: "-----------------------",
-          content: "",
-          font_family: slide.fontFamily,
-          font_size: slide.fontSize,
-          layout: slide.layout,
-          presentation: slide.presentation,
-        });
-      }
+    if (slide.title?.includes("**Slide")) {
+      sections.title = slide.title.replace(/\*\*/g, "");
     }
 
-    return apiSlides;
+    if (slide.content?.startsWith("Title:")) {
+      sections.title = slide.content
+        .split("\n")[0]
+        .replace("Title:", "")
+        .trim();
+    }
+
+    // Extract content section
+    const contentMatch = slide.content?.match(
+      /Content:(.*?)(?=Examples:|Interactive activity:|$)/s
+    );
+    if (contentMatch) {
+      sections.content = contentMatch[1].trim();
+    }
+
+    // Extract examples section
+    const examplesMatch = slide.content?.match(
+      /Examples:(.*?)(?=Interactive activity:|$)/s
+    );
+    if (examplesMatch) {
+      sections.examples = examplesMatch[1].trim();
+    }
+
+    // Extract interactive activity
+    const interactiveMatch = slide.content?.match(
+      /Interactive activity:(.*?)$/s
+    );
+    if (interactiveMatch) {
+      sections.interactive = interactiveMatch[1].trim();
+    }
+
+    return sections;
   };
 
   // Fetch slides data
@@ -224,8 +178,6 @@ const ContentPreview = () => {
 
         const processedSlides = processSlides(data[0].slides);
         setSlides(processedSlides);
-        setHistory([processedSlides]);
-        setCurrentHistoryIndex(0);
       } catch (error) {
         console.error("Fetch error:", error);
         toast({
@@ -239,46 +191,7 @@ const ContentPreview = () => {
     fetchData();
   }, [id, token, toast]);
 
-  // Update slide section with history
-  const updateSlideSection = useCallback(
-    (section, value) => {
-      setSlides((prevSlides) => {
-        const newSlides = [...prevSlides];
-        newSlides[currentSlide] = {
-          ...newSlides[currentSlide],
-          [section]: value,
-        };
-
-        // Update history
-        const newHistory = [
-          ...history.slice(0, currentHistoryIndex + 1),
-          newSlides,
-        ];
-        setHistory(newHistory);
-        setCurrentHistoryIndex(currentHistoryIndex + 1);
-
-        return newSlides;
-      });
-    },
-    [currentSlide, history, currentHistoryIndex]
-  );
-
-  // Undo/Redo handlers
-  const undo = () => {
-    if (currentHistoryIndex > 0) {
-      setCurrentHistoryIndex((prev) => prev - 1);
-      setSlides(history[currentHistoryIndex - 1]);
-    }
-  };
-
-  const redo = () => {
-    if (currentHistoryIndex < history.length - 1) {
-      setCurrentHistoryIndex((prev) => prev + 1);
-      setSlides(history[currentHistoryIndex + 1]);
-    }
-  };
-
-  // Save slides
+  // Save changes
   const saveDraft = async () => {
     try {
       if (!token) {
@@ -290,7 +203,15 @@ const ContentPreview = () => {
         return;
       }
 
-      const apiFormatSlides = convertToApiFormat(slides);
+      const formattedSlides = slides.map((slide, index) => ({
+        id: slide.id,
+        order: index + 1,
+        title: slide.title,
+        content: formatSlideContent(slide.sections),
+        font_family: slide.fontFamily,
+        font_size: slide.fontSize,
+        layout: slide.layout,
+      }));
 
       const response = await fetch(
         `https://eduai-rsjn.onrender.com/courses/${id}/contents/`,
@@ -300,12 +221,11 @@ const ContentPreview = () => {
             Authorization: `Token ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ slides: apiFormatSlides }),
+          body: JSON.stringify({ slides: formattedSlides }),
         }
       );
 
       if (!response.ok) throw new Error("Failed to save draft");
-
       toast({
         title: "Success",
         description: "Draft saved successfully",
@@ -318,6 +238,39 @@ const ContentPreview = () => {
         variant: "destructive",
       });
     }
+  };
+
+  // Format slide content for saving
+  const formatSlideContent = (sections) => {
+    let content = "";
+    if (sections.title) {
+      content += `Title: ${sections.title}\n\n`;
+    }
+    if (sections.content) {
+      content += `Content: ${sections.content}\n\n`;
+    }
+    if (sections.examples) {
+      content += `Examples: ${sections.examples}\n\n`;
+    }
+    if (sections.interactive) {
+      content += `Interactive activity: ${sections.interactive}`;
+    }
+    return content.trim();
+  };
+
+  // Update slide section
+  const updateSlideSection = (section, value) => {
+    setSlides((prevSlides) => {
+      const newSlides = [...prevSlides];
+      newSlides[currentSlide] = {
+        ...newSlides[currentSlide],
+        sections: {
+          ...newSlides[currentSlide].sections,
+          [section]: value,
+        },
+      };
+      return newSlides;
+    });
   };
 
   return (
@@ -354,7 +307,7 @@ const ContentPreview = () => {
           <div className="flex-1">
             <Card className="mb-4">
               <CardContent className="p-6">
-                {/* Current Slide Editor */}
+                {/* Slide Content Editor */}
                 <div className="bg-white rounded-lg border p-8 min-h-[400px] mb-4">
                   {slides[currentSlide] && (
                     <div className="space-y-6">
@@ -364,7 +317,7 @@ const ContentPreview = () => {
                         </label>
                         <Input
                           className="text-xl font-bold"
-                          value={slides[currentSlide].title}
+                          value={slides[currentSlide].sections.title}
                           onChange={(e) =>
                             updateSlideSection("title", e.target.value)
                           }
@@ -374,19 +327,15 @@ const ContentPreview = () => {
 
                       <div>
                         <label className="block text-sm font-medium mb-2">
-                          Main Content
+                          Content
                         </label>
                         <Textarea
                           className="min-h-[100px]"
-                          value={slides[currentSlide].mainContent}
+                          value={slides[currentSlide].sections.content}
                           onChange={(e) =>
-                            updateSlideSection("mainContent", e.target.value)
+                            updateSlideSection("content", e.target.value)
                           }
                           placeholder="Main content"
-                          style={{
-                            fontFamily: slides[currentSlide].fontFamily,
-                            fontSize: `${slides[currentSlide].fontSize}px`,
-                          }}
                         />
                       </div>
 
@@ -396,15 +345,11 @@ const ContentPreview = () => {
                         </label>
                         <Textarea
                           className="min-h-[100px]"
-                          value={slides[currentSlide].examples}
+                          value={slides[currentSlide].sections.examples}
                           onChange={(e) =>
                             updateSlideSection("examples", e.target.value)
                           }
                           placeholder="Examples"
-                          style={{
-                            fontFamily: slides[currentSlide].fontFamily,
-                            fontSize: `${slides[currentSlide].fontSize}px`,
-                          }}
                         />
                       </div>
 
@@ -414,69 +359,42 @@ const ContentPreview = () => {
                         </label>
                         <Textarea
                           className="min-h-[100px]"
-                          value={slides[currentSlide].interactiveActivity}
+                          value={slides[currentSlide].sections.interactive}
                           onChange={(e) =>
-                            updateSlideSection(
-                              "interactiveActivity",
-                              e.target.value
-                            )
+                            updateSlideSection("interactive", e.target.value)
                           }
                           placeholder="Interactive activity"
-                          style={{
-                            fontFamily: slides[currentSlide].fontFamily,
-                            fontSize: `${slides[currentSlide].fontSize}px`,
-                          }}
                         />
                       </div>
                     </div>
                   )}
                 </div>
 
-                {/* Navigation Controls */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant="outline"
-                      onClick={() =>
-                        setCurrentSlide(Math.max(0, currentSlide - 1))
-                      }
-                      disabled={currentSlide === 0}
-                    >
-                      Previous
-                    </Button>
-                    <span className="text-sm font-medium">
-                      Slide {currentSlide + 1} of {slides.length}
-                    </span>
-                    <Button
-                      variant="outline"
-                      onClick={() =>
-                        setCurrentSlide(
-                          Math.min(slides.length - 1, currentSlide + 1)
-                        )
-                      }
-                      disabled={currentSlide === slides.length - 1}
-                    >
-                      Next
-                    </Button>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={undo}
-                      disabled={currentHistoryIndex <= 0}
-                    >
-                      <Undo className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={redo}
-                      disabled={currentHistoryIndex >= history.length - 1}
-                    >
-                      <Redo className="h-4 w-4" />
-                    </Button>
-                  </div>
+                {/* Navigation */}
+                <div className="flex justify-between items-center mb-4">
+                  <Button
+                    variant="outline"
+                    onClick={() =>
+                      setCurrentSlide(Math.max(0, currentSlide - 1))
+                    }
+                    disabled={currentSlide === 0}
+                  >
+                    Previous
+                  </Button>
+                  <span className="text-sm font-medium">
+                    Slide {currentSlide + 1} of {slides.length}
+                  </span>
+                  <Button
+                    variant="outline"
+                    onClick={() =>
+                      setCurrentSlide(
+                        Math.min(slides.length - 1, currentSlide + 1)
+                      )
+                    }
+                    disabled={currentSlide === slides.length - 1}
+                  >
+                    Next
+                  </Button>
                 </div>
 
                 {/* Slide Thumbnails */}
@@ -492,7 +410,7 @@ const ContentPreview = () => {
                       onClick={() => setCurrentSlide(index)}
                     >
                       <div className="text-xs truncate">
-                        {slide.title || `Slide ${index + 1}`}
+                        {slide.sections.title || `Slide ${index + 1}`}
                       </div>
                     </div>
                   ))}
@@ -501,7 +419,7 @@ const ContentPreview = () => {
             </Card>
           </div>
 
-          {/* Right Panel - Editing Tools */}
+          {/* Settings Panel */}
           <div className="w-80">
             <Card className="sticky top-24">
               <CardContent className="p-6">
@@ -522,9 +440,16 @@ const ContentPreview = () => {
                       </label>
                       <Select
                         value={slides[currentSlide]?.fontFamily || "arial"}
-                        onValueChange={(value) =>
-                          updateSlideSection("fontFamily", value)
-                        }
+                        onValueChange={(value) => {
+                          setSlides((prev) => {
+                            const newSlides = [...prev];
+                            newSlides[currentSlide] = {
+                              ...newSlides[currentSlide],
+                              fontFamily: value,
+                            };
+                            return newSlides;
+                          });
+                        }}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Choose font" />
@@ -536,36 +461,21 @@ const ContentPreview = () => {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">
-                        Font Size
-                      </label>
-                      <Select
-                        value={slides[currentSlide]?.fontSize || "16"}
-                        onValueChange={(value) =>
-                          updateSlideSection("fontSize", value)
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Choose size" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="12">12px</SelectItem>
-                          <SelectItem value="14">14px</SelectItem>
-                          <SelectItem value="16">16px</SelectItem>
-                          <SelectItem value="18">18px</SelectItem>
-                          <SelectItem value="24">24px</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
                   </TabsContent>
 
                   <TabsContent value="layout" className="space-y-4">
                     <Select
                       value={slides[currentSlide]?.layout || "default"}
-                      onValueChange={(value) =>
-                        updateSlideSection("layout", value)
-                      }
+                      onValueChange={(value) => {
+                        setSlides((prev) => {
+                          const newSlides = [...prev];
+                          newSlides[currentSlide] = {
+                            ...newSlides[currentSlide],
+                            layout: value,
+                          };
+                          return newSlides;
+                        });
+                      }}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Choose layout" />
@@ -578,32 +488,6 @@ const ContentPreview = () => {
                     </Select>
                   </TabsContent>
                 </Tabs>
-
-                {/* AI Feedback Section */}
-                <div className="mt-6 pt-6 border-t">
-                  <div className="flex-col space-y-3 items-center justify-between mb-4">
-                    <div className="flex items-center space-x-2">
-                      <Stars className="h-5 w-5 text-yellow-500" />
-                      <h3 className="font-semibold">AI Suggestions</h3>
-                    </div>
-                    
-                    <div className="flex space-x-2">
-                      <Button variant="outline" size="sm">
-                        <ThumbsUp className="h-4 w-4 mr-2" />
-                        Helpful
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        <ThumbsDown className="h-4 w-4 mr-2" />
-                        Not Helpful
-                      </Button>
-                    </div>
-                  </div>
-                  <p className="text-sm text-gray-600">
-                    Consider adding more interactive elements to this slide. You
-                    could include a practical example or a quick quiz to
-                    reinforce the learning objectives.
-                  </p>
-                </div>
               </CardContent>
             </Card>
           </div>

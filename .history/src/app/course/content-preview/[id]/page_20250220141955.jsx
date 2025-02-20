@@ -581,7 +581,7 @@ const ContentPreview = () => {
 
                 {/* AI Feedback Section */}
                 <div className="mt-6 pt-6 border-t">
-                  <div className="flex-col space-y-3 items-center justify-between mb-4">
+                  <div className="flex-col items-center justify-between mb-4">
                     <div className="flex items-center space-x-2">
                       <Stars className="h-5 w-5 text-yellow-500" />
                       <h3 className="font-semibold">AI Suggestions</h3>
