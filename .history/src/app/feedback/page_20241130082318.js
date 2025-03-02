@@ -1,8 +1,8 @@
 "use client"
 
 import React, { useState } from "react";
-import { Button } from "../../components/ui/button";
-import { Textarea } from "../../components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Card,
   CardContent,
@@ -10,15 +10,15 @@ import {
   CardTitle,
   CardDescription,
   CardFooter,
-} from "../../components/ui/card";
+} from "@/components/ui/card";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../components/ui/select";
-import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
+} from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Star,
   Upload,

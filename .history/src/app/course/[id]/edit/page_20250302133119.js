@@ -21,7 +21,7 @@ import {
   FormLabel,
   FormMessage,
 } from "../../../../components/ui/form";
-import { useToast } from "../../../../hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Loader2, Save, ArrowLeft, Upload, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";

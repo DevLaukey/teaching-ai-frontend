@@ -1,16 +1,16 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Button } from "../../../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
   CardDescription,
-} from "../../../../components/ui/card";
+} from "@/components/ui/card";
 import { Eye, Image as ImageIcon } from "lucide-react";
-import { useToast } from "../../../hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Book, Edit, FileText, Clock, Users } from "lucide-react";
 

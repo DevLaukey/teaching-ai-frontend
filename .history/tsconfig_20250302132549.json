@@ -33,10 +33,6 @@
     "node_modules"
   ],
   "paths": {
-    "@/components/*": ["src/components/*"],
-    "@/lib/*": ["src/lib/*"],
-    "@/styles/*": ["src/styles/*"],
-    "@/pages/*": ["src/pages/*"],
-    "@/public/*": ["public/*"]
+    "@/*": ["src/*"]
   }
 }

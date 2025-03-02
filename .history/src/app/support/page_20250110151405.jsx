@@ -1,8 +1,8 @@
 "use client"
 
 import React, { useState } from "react";
-import { Button } from "../../components/ui/button";
-import { Input } from "../../components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
@@ -10,20 +10,20 @@ import {
   CardTitle,
   CardDescription,
   CardFooter,
-} from "../../components/ui/card";
+} from "@/components/ui/card";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "../../components/ui/accordion";
+} from "@/components/ui/accordion";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "../../components/ui/sheet";
+} from "@/components/ui/sheet";
 import {
   Search,
   MessageCircle,
