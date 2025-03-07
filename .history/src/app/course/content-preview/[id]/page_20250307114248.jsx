@@ -215,7 +215,7 @@ const ContentPreview = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/courses/${id}/contents/`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/${id}/contents/`,
           {
             method: "GET",
             headers: {

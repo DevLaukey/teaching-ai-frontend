@@ -166,7 +166,7 @@ const CourseCreation = () => {
       }
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/courses/`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/contents/`,
         {
           method: "POST",
           headers: {

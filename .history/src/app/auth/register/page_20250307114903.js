@@ -126,7 +126,7 @@ const RegisterPage = () => {
         }
 
         //make call to login endpoint
-        const loginResponse = await fetch(`${backendUrl}/auth/token/login/`, {
+        const loginResponse = await fetch(`${backendUrl}auth/token/login/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

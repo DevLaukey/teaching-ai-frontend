@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+const API_URL = "https://ams-api-534297186371.us-central1.run.app/query/";
 
 export async function POST(request: Request) {
   try {
