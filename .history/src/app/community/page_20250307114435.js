@@ -82,7 +82,7 @@ const CommunitySharing = () => {
       });
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/courses/?${queryParams}`,
+        `https://eduai-rsjn.onrender.com/courses/?${queryParams}`,
         {
           headers: {
             Authorization: `Token ${token}`,

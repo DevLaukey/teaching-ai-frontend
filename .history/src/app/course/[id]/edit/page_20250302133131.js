@@ -68,7 +68,7 @@ const [mediaType, setMediaType] = useState(null);
       }
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/${id}/`,
+        `https://eduai-rsjn.onrender.com/courses/${id}/`,
         {
           method: "GET",
           headers: {
@@ -189,7 +189,7 @@ const [mediaType, setMediaType] = useState(null);
       });
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/${id}/`,
+        `https://eduai-rsjn.onrender.com/courses/${id}/`,
         {
           method: "PUT",
           headers: {

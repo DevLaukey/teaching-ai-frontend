@@ -67,7 +67,7 @@ const MyCourses = () => {
        throw new Error("No authentication token found");
      }
 
-     const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/courses/`, {
+     const response = await fetch(`${${process.env.NEXT_PUBLIC_BACKEND_URL}/courses/`, {
        method: "GET",
        headers: {
          "Content-Type": "application/json",

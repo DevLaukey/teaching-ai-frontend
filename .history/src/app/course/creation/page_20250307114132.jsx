@@ -126,16 +126,13 @@ const CourseCreation = () => {
         }
       });
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/courses/`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-          body: submitData,
-        }
-      );
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/courses/`, {
+        method: "POST",
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+        body: submitData,
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

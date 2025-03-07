@@ -215,7 +215,7 @@ const ContentPreview = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/${id}/contents/`,
+          `https://eduai-rsjn.onrender.com/courses/${id}/contents/`,
           {
             method: "GET",
             headers: {

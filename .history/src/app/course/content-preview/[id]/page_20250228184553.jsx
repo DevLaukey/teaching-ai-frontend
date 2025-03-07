@@ -3,12 +3,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { Button } from "../../../../components/ui/button";
 import { Card, CardContent } from "../../../../components/ui/card";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "../../../../components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../components/ui/tabs";
 import { Input } from "../../../../components/ui/input";
 import { Textarea } from "../../../../components/ui/textarea";
 import {
@@ -215,7 +210,7 @@ const ContentPreview = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/${id}/contents/`,
+          `https://eduai-rsjn.onrender.com/courses/${id}/contents/`,
           {
             method: "GET",
             headers: {
@@ -226,6 +221,7 @@ const ContentPreview = () => {
 
         if (!response.ok) throw new Error("Failed to fetch data");
         const data = await response.json();
+
 
         console.log(data);
         const processedSlides = processSlides(data[0].slides);
@@ -299,7 +295,7 @@ const ContentPreview = () => {
       const apiFormatSlides = convertToApiFormat(slides);
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/${id}/contents/`,
+        `https://eduai-rsjn.onrender.com/courses/${id}/contents/`,
         {
           method: "PATCH",
           headers: {
@@ -592,7 +588,7 @@ const ContentPreview = () => {
                       <Stars className="h-5 w-5 text-yellow-500" />
                       <h3 className="font-semibold">AI Suggestions</h3>
                     </div>
-
+                    
                     <div className="flex space-x-2">
                       <Button variant="outline" size="sm">
                         <ThumbsUp className="h-4 w-4 mr-2" />

@@ -40,7 +40,7 @@ const SettingsProfile = () => {
         }
 
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/users/me/`,
+          "https://eduai-rsjn.onrender.com/auth/users/me/",
           {
             headers: {
               Authorization: `Token ${token}`,
