@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
-import { useToast } from "../../hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import {
   Card,
   CardContent,
@@ -175,7 +175,7 @@ const CommunitySharing = () => {
                   <DialogHeader>
                     <DialogTitle>Create New Course</DialogTitle>
                   </DialogHeader>
-                  {/* Add course creation form here */}
+    
                 </DialogContent>
               </Dialog>
             </div>
