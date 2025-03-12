@@ -1,12 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Button } from "../../components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../../components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,24 +29,15 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Navigation from "../../components/Navbar";
-import { useAuth } from "../../lib/AuthContext";
 
 const Dashboard = () => {
   const router = useRouter();
-  const { user, logout, isAuthenticated, loading } = useAuth();
 
   const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [recentCourses, setRecentCourses] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
-  const [dataLoading, setDataLoading] = useState(true);
-
-  // Check if user is authenticated before loading data
-  useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      router.push("/auth/login");
-    }
-  }, [isAuthenticated, loading, router]);
 
   // Function to get recent courses
   const getRecentCourses = (allCourses) => {
@@ -116,11 +102,8 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    // Only fetch courses if the user is authenticated
-    if (!loading && isAuthenticated) {
-      fetchCourses();
-    }
-  }, [isAuthenticated, loading]);
+    fetchCourses();
+  }, []);
 
   const fetchCourses = async () => {
     try {
@@ -129,16 +112,13 @@ const Dashboard = () => {
         throw new Error("No authentication token found");
       }
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/courses`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Token ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/courses/all`, {
+        method: "GET",
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       if (!response.ok) {
         throw new Error("Failed to fetch courses");
@@ -148,19 +128,25 @@ const Dashboard = () => {
       setCourses(data);
       setRecentCourses(getRecentCourses(data));
       setRecentActivity(getRecentActivity(data));
+      setLoading(false);
     } catch (err) {
       setError(err.message);
-    } finally {
-      setDataLoading(false);
+      setLoading(false);
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("userProfile");
+    router.push("/auth/login");
   };
 
   const handleCourseClick = (courseId) => {
     router.push(`/course/${courseId}`);
   };
 
-  // Show loading state while checking authentication or fetching data
-  if (loading || (isAuthenticated && dataLoading)) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -168,18 +154,12 @@ const Dashboard = () => {
     );
   }
 
-  // Show error message if there's an error
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-red-500">Error: {error}</div>
       </div>
     );
-  }
-
-  // Redirect handled by the useEffect, so nothing to render if not authenticated
-  if (!isAuthenticated) {
-    return null;
   }
 
   const publishedCourses = courses.filter((course) => course.is_published);
@@ -399,7 +379,7 @@ const Dashboard = () => {
                             )}
                           </div>
                           <div className="text-xs text-gray-500">
-                            {activity.time} • {activity.subject.toUpperCase()}
+                            {activity.time} • {(activity.subject).toUpperCase()}
                           </div>
                         </div>
                       </div>

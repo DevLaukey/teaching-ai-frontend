@@ -64,9 +64,9 @@ const LoginPage = () => {
         <Card>
           <CardHeader>
             <CardTitle>Sign In</CardTitle>
-            {/* <CardDescription>
+            <CardDescription>
               Choose your preferred sign in method
-            </CardDescription> */}
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Google Sign In */}
@@ -100,7 +100,7 @@ const LoginPage = () => {
               Continue with Google
             </Button> */}
 
-            {/* <div className="relative">
+            <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t" />
               </div>
@@ -109,7 +109,7 @@ const LoginPage = () => {
                   Or continue with
                 </span>
               </div>
-            </div> */}
+            </div>
 
             {/* Email/Password Form */}
             <form className="space-y-4" onSubmit={handleLogin}>
