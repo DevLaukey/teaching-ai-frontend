@@ -364,7 +364,7 @@ const Dashboard = () => {
                         </div>
                         <div>
                           <div className="text-sm">
-                            You {activity.type}ed{" "}
+                            You {activity.type}d{" "}
                             <span className="font-medium">
                               {activity.course}
                             </span>

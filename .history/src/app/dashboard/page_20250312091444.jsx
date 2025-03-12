@@ -171,7 +171,8 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <Navigation />
+      <Navigation/>
+    
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -291,51 +292,47 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {recentCourses.length == 0 ? (
-                    <p>No recent activity yet</p>
-                  ) : (
-                    recentCourses.map((course) => (
-                      <div
-                        key={course.id}
-                        className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100"
-                        onClick={() => handleCourseClick(course.id)}
-                      >
-                        <div className="flex items-center space-x-4">
-                          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                            <Book className="h-5 w-5 text-blue-600" />
-                          </div>
-                          <div>
-                            <div className="font-medium">{course.title}</div>
-                            <div className="text-sm text-gray-500">
-                              Last edited {course.lastEdited}
-                            </div>
-                          </div>
+                  {recentCourses.map((course) => (
+                    <div
+                      key={course.id}
+                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100"
+                      onClick={() => handleCourseClick(course.id)}
+                    >
+                      <div className="flex items-center space-x-4">
+                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                          <Book className="h-5 w-5 text-blue-600" />
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              router.push(`/course/${course.id}/edit`);
-                            }}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              // Handle download
-                            }}
-                          >
-                            <Download className="h-4 w-4" />
-                          </Button>
+                        <div>
+                          <div className="font-medium">{course.title}</div>
+                          <div className="text-sm text-gray-500">
+                            Last edited {course.lastEdited}
+                          </div>
                         </div>
                       </div>
-                    ))
-                  )}
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(`/course/${course.id}/edit`);
+                          }}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // Handle download
+                          }}
+                        >
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
@@ -347,44 +344,38 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {recentActivity.length == 0 ? (
-                    <p>No recent activity yet</p>
-                  ) : (
-                    recentActivity.map((activity) => (
-                      <div
-                        key={activity.id}
-                        className="flex items-center space-x-4"
-                      >
-                        <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                          {activity.type === "edit" ? (
-                            <Edit className="h-4 w-4 text-gray-600" />
+                  {recentActivity.length == 0 ? <p>No recent activity yet</p>:recentActivity.map((activity) => (
+                    <div
+                      key={activity.id}
+                      className="flex items-center space-x-4"
+                    >
+                      <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                        {activity.type === "edit" ? (
+                          <Edit className="h-4 w-4 text-gray-600" />
+                        ) : (
+                          <Clock className="h-4 w-4 text-gray-600" />
+                        )}
+                      </div>
+                      <div>
+                        <div className="text-sm">
+                          You {activity.type}d{" "}
+                          <span className="font-medium">{activity.course}</span>
+                          {activity.is_published ? (
+                            <span className="ml-2 text-xs text-green-600">
+                              (Published)
+                            </span>
                           ) : (
-                            <Clock className="h-4 w-4 text-gray-600" />
+                            <span className="ml-2 text-xs text-gray-500">
+                              (Draft)
+                            </span>
                           )}
                         </div>
-                        <div>
-                          <div className="text-sm">
-                            You {activity.type}ed{" "}
-                            <span className="font-medium">
-                              {activity.course}
-                            </span>
-                            {activity.is_published ? (
-                              <span className="ml-2 text-xs text-green-600">
-                                (Published)
-                              </span>
-                            ) : (
-                              <span className="ml-2 text-xs text-gray-500">
-                                (Draft)
-                              </span>
-                            )}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {activity.time} • {(activity.subject).toUpperCase()}
-                          </div>
+                        <div className="text-xs text-gray-500">
+                          {activity.time} • {activity.subject}
                         </div>
                       </div>
-                    ))
-                  )}
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>

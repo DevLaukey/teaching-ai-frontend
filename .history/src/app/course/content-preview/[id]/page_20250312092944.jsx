@@ -231,7 +231,7 @@ const ContentPreview = () => {
 
 
 
-        console.log(data);
+        console.log(response.json);
         const processedSlides = processSlides(data[0]?.slides);
         setSlides(processedSlides);
         setHistory([processedSlides]);

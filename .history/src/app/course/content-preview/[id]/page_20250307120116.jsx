@@ -224,15 +224,11 @@ const ContentPreview = () => {
           }
         );
 
-
-
         if (!response.ok) throw new Error("Failed to fetch data");
         const data = await response.json();
 
-
-
         console.log(data);
-        const processedSlides = processSlides(data[0]?.slides);
+        const processedSlides = processSlides(data[0].slides);
         setSlides(processedSlides);
         setHistory([processedSlides]);
         setCurrentHistoryIndex(0);

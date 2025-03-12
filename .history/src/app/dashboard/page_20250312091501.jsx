@@ -364,7 +364,7 @@ const Dashboard = () => {
                         </div>
                         <div>
                           <div className="text-sm">
-                            You {activity.type}ed{" "}
+                            You {activity.type}d{" "}
                             <span className="font-medium">
                               {activity.course}
                             </span>
@@ -379,7 +379,7 @@ const Dashboard = () => {
                             )}
                           </div>
                           <div className="text-xs text-gray-500">
-                            {activity.time} • {(activity.subject).toUpperCase()}
+                            {activity.time} • {activity.subject}
                           </div>
                         </div>
                       </div>

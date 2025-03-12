@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-} from "../../../components/ui/card";
+} from "../../../../components/ui/card";
 import { Eye, Image as ImageIcon } from "lucide-react";
 import { useToast } from "../../../hooks/use-toast";
 import { useParams, useRouter } from "next/navigation";
@@ -36,7 +36,7 @@ const CourseView = () => {
         }
 
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/courses/${id}/`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/${id}/`,
           {
             method: "GET",
             headers: {
@@ -50,8 +50,6 @@ const CourseView = () => {
         }
 
         const data = await response.json();
-
-        console.log("Course data:", data);
         setCourseData(data);
       } catch (error) {
         console.error("Error fetching course:", error);

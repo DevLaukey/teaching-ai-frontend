@@ -36,7 +36,7 @@ const CourseView = () => {
         }
 
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/courses/${id}/`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/${id}/`,
           {
             method: "GET",
             headers: {
