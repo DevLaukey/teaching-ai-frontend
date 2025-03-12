@@ -59,7 +59,6 @@ export function AuthProvider({ children }) {
   }, [backendUrl]);
 
   const login = async (credentials) => {
-
     try {
       const response = await fetch(`${backendUrl}/auth/token/login/`, {
         method: "POST",
@@ -87,16 +86,15 @@ export function AuthProvider({ children }) {
 
           // Fetch user data'
           
+          console.log(data.auth_token);
         try {
-          const userResponse = await fetch(`${backendUrl}/profile/`, {
+          const userResponse = await fetch(`${backendUrl}/auth/users/me/`, {
             method: "GET",
             headers: {
               Authorization: `Token ${data.auth_token}`,
             },
           });
 
-
-          console.log("userResponse:", userResponse);
           if (userResponse.ok) {
             const userData = await userResponse.json();
             setUser(userData);

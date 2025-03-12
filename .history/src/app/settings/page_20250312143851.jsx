@@ -15,7 +15,6 @@ import { useToast } from "../../hooks/use-toast";
 
 const SettingsProfile = () => {
   const { toast } = useToast();
-  const token = localStorage.getItem("token");
 
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -30,6 +29,7 @@ const SettingsProfile = () => {
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
+        const token = localStorage.getItem("token");
         if (!token) {
           toast({
             title: "Error",
@@ -38,8 +38,6 @@ const SettingsProfile = () => {
           });
           return;
         }
-
-        console.log("token", token);
 
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/profile/`,

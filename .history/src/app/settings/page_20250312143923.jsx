@@ -39,8 +39,6 @@ const SettingsProfile = () => {
           return;
         }
 
-        console.log("token", token);
-
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/profile/`,
           {

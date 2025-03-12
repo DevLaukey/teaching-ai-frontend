@@ -60,6 +60,7 @@ export function AuthProvider({ children }) {
 
   const login = async (credentials) => {
 
+    console.log("credentials:", credentials);
     try {
       const response = await fetch(`${backendUrl}/auth/token/login/`, {
         method: "POST",
