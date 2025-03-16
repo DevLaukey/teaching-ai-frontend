@@ -13,33 +13,25 @@ import { Eye, Image as ImageIcon } from "lucide-react";
 import { useToast } from "../../../hooks/use-toast";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Book, Edit, FileText, Clock, Users } from "lucide-react";
-import { useAuth } from "../../../lib/AuthContext";
-import Cookies from "js-cookie";
 
 const CourseView = () => {
   const param = useParams();
   const { id } = param;
   const router = useRouter();
   const { toast } = useToast();
-  const { isAuthenticated } = useAuth();
   const [courseData, setCourseData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCourseData = async () => {
       try {
-        // Use the auth token from cookies instead of localStorage
-        const token = Cookies.get("authToken");
-
+        const token = localStorage.getItem("token");
         if (!token) {
           toast({
-            title: "Authentication Error",
+            title: "Error",
             description: "Please login to view course details",
             variant: "destructive",
           });
-          router.push(
-            "/auth/login?redirect=" + encodeURIComponent(`/course/${id}`)
-          );
           return;
         }
 
@@ -50,27 +42,16 @@ const CourseView = () => {
             headers: {
               Authorization: `Token ${token}`,
             },
-            credentials: "include", // Important for cross-origin requests with cookies
           }
         );
 
         if (!response.ok) {
-          if (response.status === 401 || response.status === 403) {
-            // Handle authentication errors
-            toast({
-              title: "Session Expired",
-              description: "Your session has expired. Please login again.",
-              variant: "destructive",
-            });
-            router.push(
-              "/auth/login?redirect=" + encodeURIComponent(`/course/${id}`)
-            );
-            return;
-          }
           throw new Error("Failed to fetch course data");
         }
 
         const data = await response.json();
+
+        console.log("Course data:", data);
         setCourseData(data);
       } catch (error) {
         console.error("Error fetching course:", error);
@@ -84,20 +65,8 @@ const CourseView = () => {
       }
     };
 
-    // Only fetch if authenticated
-    if (isAuthenticated) {
-      fetchCourseData();
-    } else {
-      toast({
-        title: "Authentication Required",
-        description: "Please login to view course details",
-        variant: "destructive",
-      });
-      router.push(
-        "/auth/login?redirect=" + encodeURIComponent(`/course/${id}`)
-      );
-    }
-  }, [id, toast, router, isAuthenticated]);
+    fetchCourseData();
+  }, [id, toast]);
 
   if (loading) {
     return (

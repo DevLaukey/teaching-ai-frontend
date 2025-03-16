@@ -3,7 +3,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie"; // Install with: npm install js-cookie
 
 const AuthContext = createContext(undefined);
 
@@ -13,37 +12,22 @@ export function AuthProvider({ children }) {
   const router = useRouter();
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-  // Helper function to set auth token in cookies
-  const setAuthToken = (token) => {
-    if (token) {
-      // Set in js-cookie (for client-side usage)
-      Cookies.set("authToken", token, {
-        expires: 7, // 7 days
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "Lax",
-      });
-    } else {
-      // Remove token when called with null/undefined
-      Cookies.remove("authToken");
-    }
-  };
-
-  // Helper function to get auth token from cookies
-  const getAuthToken = () => {
-    return Cookies.get("authToken");
-  };
-
   useEffect(() => {
     // Check if the user is authenticated on initial load
     const checkAuth = async () => {
       try {
-        // Get token from cookie
-        const token = getAuthToken();
+        // Get token from localStorage
+        const token = localStorage.getItem("token");
 
         if (token) {
+          // Set cookie for the middleware to access
+          document.cookie = `token=${token}; path=/; max-age=${
+            60 * 60 * 24 * 7
+          }`; // 7 days
+
           // You could also validate the token with your backend
           try {
-            const response = await fetch(`${backendUrl}/auth/profile/`, {
+            const response = await fetch(`${backendUrl}/auth/profilee/`, {
               method: "GET",
               headers: {
                 Authorization: `Token ${token}`,
@@ -55,7 +39,9 @@ export function AuthProvider({ children }) {
               setUser(userData);
             } else {
               // If token is invalid, clear it
-              setAuthToken(null);
+              localStorage.removeItem("token");
+              document.cookie =
+                "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
               setUser(null);
             }
           } catch (error) {
@@ -73,6 +59,7 @@ export function AuthProvider({ children }) {
   }, [backendUrl]);
 
   const login = async (credentials) => {
+
     try {
       const response = await fetch(`${backendUrl}/auth/token/login/`, {
         method: "POST",
@@ -81,7 +68,6 @@ export function AuthProvider({ children }) {
         },
         body: JSON.stringify(credentials),
         mode: "cors",
-        credentials: "include", // Important for cookies in cross-origin requests
       });
 
       const data = await response.json();
@@ -90,11 +76,17 @@ export function AuthProvider({ children }) {
         throw new Error(data.non_field_errors || "Login failed");
       }
 
-      // Store the token in cookie
+      // Store the token
       if (data.auth_token) {
-        setAuthToken(data.auth_token);
+        localStorage.setItem("token", data.auth_token);
 
-        // Fetch user data
+        // Set cookie for middleware to detect
+        document.cookie = `token=${data.auth_token}; path=/; max-age=${
+          60 * 60 * 24 * 7
+        }`; // 7 days
+
+          // Fetch user data'
+          
         try {
           const userResponse = await fetch(`${backendUrl}/profile/`, {
             method: "GET",
@@ -103,6 +95,8 @@ export function AuthProvider({ children }) {
             },
           });
 
+
+          console.log("userResponse:", userResponse);
           if (userResponse.ok) {
             const userData = await userResponse.json();
             setUser(userData);
@@ -130,7 +124,7 @@ export function AuthProvider({ children }) {
 
   const logout = async () => {
     try {
-      const token = getAuthToken();
+      const token = localStorage.getItem("token");
 
       if (token) {
         // Call backend logout endpoint
@@ -140,7 +134,6 @@ export function AuthProvider({ children }) {
             headers: {
               Authorization: `Token ${token}`,
             },
-            credentials: "include",
           });
         } catch (error) {
           console.error("Logout API error:", error);
@@ -150,44 +143,10 @@ export function AuthProvider({ children }) {
       console.error("Logout error:", error);
     } finally {
       // Clear token and user data regardless of API response
-      setAuthToken(null);
+      localStorage.removeItem("token");
+      document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
       setUser(null);
       router.push("/auth/login");
-    }
-  };
-
-  // Registration can be handled with the login flow
-  const register = async (userData) => {
-    try {
-      const response = await fetch(`${backendUrl}/register/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
-        mode: "cors",
-        credentials: "include",
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        // Extract error messages from the response
-        const errorMsg = Object.values(data).flat().join(", ");
-        throw new Error(errorMsg || "Registration failed");
-      }
-
-      // Login after successful registration
-      return login({
-        email: userData.email,
-        password: userData.password,
-      });
-    } catch (error) {
-      console.error("Registration error:", error);
-      return {
-        success: false,
-        error: error.message || "Failed to register. Please try again.",
-      };
     }
   };
 
@@ -196,7 +155,6 @@ export function AuthProvider({ children }) {
     loading,
     login,
     logout,
-    register,
     isAuthenticated: !!user,
   };
 

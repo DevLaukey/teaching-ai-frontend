@@ -143,7 +143,6 @@ const CourseCreation = () => {
 
       const { id } = await response.json();
       console.log("Course created", id);
-      
 
       // Append the course ID to the form data
       submitData.append("course_id", id);
@@ -172,8 +171,8 @@ const CourseCreation = () => {
           method: "POST",
           headers: {
             Authorization: `Token ${token}`,
+            mode: "no-cors",
           },
-          mode: "no-cors",
           body: submitData,
         }
       );

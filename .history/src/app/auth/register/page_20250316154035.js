@@ -117,11 +117,9 @@ const RegisterPage = () => {
         
         if (!result.success) {
           throw new Error(result.error || "Registration failed");
-        }
-      }
 
           // Redirect handled by login function
-         catch (error) {
+        } catch (error) {
           setServerError(
             error.message || "Failed to register. Please try again."
           );
@@ -132,7 +130,7 @@ const RegisterPage = () => {
         setIsLoading(false);
       }
     };
-  
+  };
   const handleGoogleSignUp = async () => {
     try {
       setIsLoading(true);

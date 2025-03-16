@@ -22,11 +22,11 @@ import { Checkbox } from "../../../components/ui/checkbox";
 import { GraduationCap, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../../lib/AuthContext";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 
 const RegisterPage = () => {
   const router = useRouter();
-  const { register } = useAuth();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -106,50 +106,72 @@ const RegisterPage = () => {
 
     if (validateForm()) {
       try {
-        // Use the AuthContext's register function
-        const result = await register({
-          first_name: formData.firstName,
-          last_name: formData.lastName,
+        // Register the user
+        const response = await fetch(`${backendUrl}/register/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            email: formData.email,
+            password: formData.password,
+            role: formData.role,
+          }),
+          mode: "cors",
+          credentials: "include",
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.email || "Registration failed");
+        }
+
+        // Log the user in using the AuthContext
+        const loginResult = await login({
           email: formData.email,
           password: formData.password,
-          role: formData.role,
         });
-        
-        if (!result.success) {
-          throw new Error(result.error || "Registration failed");
-        }
-      }
 
-          // Redirect handled by login function
-         catch (error) {
-          setServerError(
-            error.message || "Failed to register. Please try again."
+        if (!loginResult.success) {
+          throw new Error(
+            loginResult.error || "Login after registration failed"
           );
-        } finally {
-          setIsLoading(false);
         }
-      } else {
+
+        // Redirect handled by login function
+      } catch (error) {
+        setServerError(
+          error.message || "Failed to register. Please try again."
+        );
+      } finally {
         setIsLoading(false);
       }
-    };
-  
+    } else {
+      setIsLoading(false);
+    }
+  };
+
   const handleGoogleSignUp = async () => {
     try {
       setIsLoading(true);
-      
-      // Use the AuthContext's register function with Google provider
-      const result = await register({ 
-        provider: 'google',
-        role: 'instructor' // Default role for Google signup
-      });
-      
+
+      // Use the AuthContext's login for Google registration
+      const result = await login({ provider: "google", isRegistration: true });
+
       if (!result.success) {
-        setServerError(result.error || "Google registration failed. Please try again.");
+        setServerError(
+          result.error || "Google registration failed. Please try again."
+        );
       }
-      
-      // Redirect handled by register function
+
+      // Redirect handled by login function
     } catch (err) {
-      setServerError(err.message || "Failed to register with Google. Please try again.");
+      setServerError(
+        err.message || "Failed to register with Google. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
