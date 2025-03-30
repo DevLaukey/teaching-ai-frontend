@@ -67,7 +67,7 @@ const CourseFinalization = () => {
     const fetchCourseData = async () => {
       try {
         const response = await fetch(
-          process.env.NEXT_PUBLIC_BACKEND_URL + `/courses/${id}/contents/`,
+          process.env.NEXT_PUBLIC_BACKEND_URL + `courses/${id}/contents/`,
           {
             headers: {
               Authorization: `Token ${token}`,

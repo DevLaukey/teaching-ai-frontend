@@ -27,103 +27,73 @@ import {
   Undo,
   Redo,
   Stars,
+  MessageSquare,
   ThumbsUp,
   ThumbsDown,
+  Trash2,
   CheckCircle,
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useToast } from "../../../../hooks/use-toast";
-import { useAuth } from "../../../../lib/AuthContext";
-import Cookies from "js-cookie";
 
 const ContentPreview = () => {
   const router = useRouter();
   const { id } = useParams();
   const { toast } = useToast();
-  const { isAuthenticated } = useAuth();
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [slides, setSlides] = useState([]);
   const [history, setHistory] = useState([]);
   const [currentHistoryIndex, setCurrentHistoryIndex] = useState(-1);
-  const [loading, setLoading] = useState(true);
+
+  const token = localStorage.getItem("token");
 
   // Process raw slides into grouped format
   const processSlides = (rawSlides) => {
-    console.log("Processing raw slides:", rawSlides);
-
-    if (!Array.isArray(rawSlides) || rawSlides.length === 0) {
-      console.error("Invalid slides data:", rawSlides);
-      return [];
-    }
-
     const processedSlides = [];
 
     // For each slide in the raw data
     for (const slide of rawSlides) {
-      if (!slide || !slide.title) {
-        console.warn("Skipping invalid slide:", slide);
-        continue;
-      }
+      // Extract slide data based on the format received from API
+      if (slide.title.startsWith("### Slide")) {
+        // Direct format (### Slide X: Title with combined content)
+        const slideTitle = slide.title.replace(/^### Slide \d+:\s*/, "");
 
-      // Check if the title starts with "Slide" or contains ":**"
-      const titleMatch = slide.title.match(/\*\*Slide (\d+):(.*?)\*\*/);
-
-      if (titleMatch || slide.title.includes("Slide")) {
-        // Extract the title - handle both formats
-        let slideTitle = "";
-        if (titleMatch) {
-          slideTitle = titleMatch[2].trim();
-        } else {
-          slideTitle = slide.title.replace(/^.*?Slide \d+:\s*/, "").trim();
-        }
-
-        // Parse the content field which typically includes Content, Examples, and Activity
+        // Parse the content field which includes Content, Examples, and Activity
         const content = slide.content || "";
 
-        // Look for bullet points or sections in the content
-        // Remove the leading "- " if present at the beginning
-        const cleanContent = content.startsWith("- ")
-          ? content.substring(2)
-          : content;
-        const contentParts = cleanContent.split(/\n-\s+/);
-
-        // Extract main content, examples, and activity based on their position or keywords
+        // Extract main content
         let mainContent = "";
+        const contentMatch = content.match(
+          /\*\*Content:\*\*\s*([\s\S]*?)(?=\*\*Examples:|$)/
+        );
+        if (contentMatch && contentMatch[1]) {
+          mainContent = contentMatch[1].trim();
+        }
+
+        // Extract examples
         let examples = "";
+        const examplesMatch = content.match(
+          /\*\*Examples:\*\*\s*([\s\S]*?)(?=\*\*Activity:|$)/
+        );
+        if (examplesMatch && examplesMatch[1]) {
+          examples = examplesMatch[1].trim();
+        }
+
+        // Extract activity
         let interactiveActivity = "";
-
-        // Process each part of the content to identify what it contains
-        contentParts.forEach((part, index) => {
-          part = part.trim();
-
-          // Determine the section based on content keywords
-          if (
-            part.toLowerCase().includes("example:") ||
-            part.toLowerCase().includes("examples:") ||
-            (index === 1 && part.toLowerCase().includes("example"))
-          ) {
-            examples += part + "\n";
-          } else if (
-            part.toLowerCase().includes("interactive activity:") ||
-            part.toLowerCase().includes("activity:") ||
-            (index === 2 && part.toLowerCase().includes("activity"))
-          ) {
-            interactiveActivity += part + "\n";
-          } else if (part) {
-            // Assume it's main content if not explicitly examples or activity
-            // This is typically the first part
-            mainContent += part + "\n";
-          }
-        });
+        const activityMatch = content.match(/\*\*Activity:\*\*\s*([\s\S]*?)$/);
+        if (activityMatch && activityMatch[1]) {
+          interactiveActivity = activityMatch[1].trim();
+        }
 
         // Create processed slide object
         processedSlides.push({
           id: slide.id,
           title: slideTitle,
-          mainContent: mainContent.trim(),
-          examples: examples.trim(),
-          interactiveActivity: interactiveActivity.trim(),
+          mainContent: mainContent,
+          examples: examples,
+          interactiveActivity: interactiveActivity,
           fontFamily: slide.font_family || "arial",
           fontSize: slide.font_size || "16",
           layout: slide.layout || "default",
@@ -132,50 +102,58 @@ const ContentPreview = () => {
       }
     }
 
-    console.log("Processed slides result:", processedSlides);
     return processedSlides;
   };
 
   // Convert processed slides back to API format
   const convertToApiFormat = (processedSlides) => {
     const apiSlides = [];
+    let order = 1;
 
-    for (let i = 0; i < processedSlides.length; i++) {
-      const slide = processedSlides[i];
-      const slideNumber = i + 1;
-
-      // Format the title with "**Slide X: Title**" to match original format
-      const formattedTitle = `**Slide ${slideNumber}: ${slide.title}**`;
-
-      // Build the content with bullet points as in the original format
-      let fullContent = "";
-
-      // Add main content
-      if (slide.mainContent) {
-        fullContent += "- " + slide.mainContent + "\n";
-      }
-
-      // Add examples if present
-      if (slide.examples) {
-        fullContent += "- " + slide.examples + "\n";
-      }
-
-      // Add interactive activity if present
-      if (slide.interactiveActivity) {
-        fullContent += "- " + slide.interactiveActivity;
-      }
-
-      // Add the slide with all content in the same format as the API expects
+    for (const slide of processedSlides) {
+      // Add slide title using the newer format
       apiSlides.push({
         id: slide.id || Date.now() + Math.random(),
-        order: slideNumber,
-        title: formattedTitle,
-        content: fullContent.trim(),
+        order: order++,
+        title: `### Slide ${order - 1}: ${slide.title}`,
+        content: "",
         font_family: slide.fontFamily,
         font_size: slide.fontSize,
         layout: slide.layout,
         presentation: slide.presentation,
       });
+
+      // Combine content, examples, and activity into a structured format
+      let fullContent = "";
+
+      // Add main content
+      if (slide.mainContent) {
+        fullContent += "**Content:** \n" + slide.mainContent + "\n";
+      }
+
+      // Add examples if present
+      if (slide.examples) {
+        fullContent += "\n**Examples:** \n" + slide.examples + "\n";
+      }
+
+      // Add interactive activity if present
+      if (slide.interactiveActivity) {
+        fullContent += "\n**Activity:** \n" + slide.interactiveActivity;
+      }
+
+      // Add the combined content as a single item
+      if (fullContent) {
+        apiSlides.push({
+          id: Date.now() + Math.random(),
+          order: order++,
+          title: "",
+          content: fullContent.trim(),
+          font_family: slide.fontFamily,
+          font_size: slide.fontSize,
+          layout: slide.layout,
+          presentation: slide.presentation,
+        });
+      }
     }
 
     return apiSlides;
@@ -184,24 +162,7 @@ const ContentPreview = () => {
   // Fetch slides data
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
       try {
-        // Get token from cookies instead of localStorage
-        const token = Cookies.get("authToken");
-
-        if (!token) {
-          toast({
-            title: "Authentication Error",
-            description: "Please login to view course content",
-            variant: "destructive",
-          });
-          router.push(
-            "/auth/login?redirect=" +
-              encodeURIComponent(`/course/content-preview/${id}`)
-          );
-          return;
-        }
-
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/courses/${id}/contents/`,
           {
@@ -209,62 +170,18 @@ const ContentPreview = () => {
             headers: {
               Authorization: `Token ${token}`,
             },
-            credentials: "include", // Important for cross-origin requests with cookies
           }
         );
 
-        if (!response.ok) {
-          if (response.status === 401 || response.status === 403) {
-            toast({
-              title: "Session Expired",
-              description: "Your session has expired. Please login again.",
-              variant: "destructive",
-            });
-            router.push(
-              "/auth/login?redirect=" +
-                encodeURIComponent(`/course/content-preview/${id}`)
-            );
-            return;
-          }
-          throw new Error("Failed to fetch data");
-        }
-
+        if (!response.ok) throw new Error("Failed to fetch data");
         const data = await response.json();
-        console.log("Fetched data:", data);
 
-        // Handle different response formats - extract slides from the nested structure
-        let slidesData;
-        console.log("Extracted slides data:", data);
-
-        if (
-          Array.isArray(data) &&
-          data.length > 0 &&
-          data[0].slides &&
-          Array.isArray(data[0].slides)
-        ) {
-          // Format from your console output: array with nested slides array
-          slidesData = data[0].slides;
-          console.log("Found slides in data[0].slides:", slidesData);
-        } else if (Array.isArray(data)) {
-          // If the response is an array of slides directly
-          slidesData = data;
-          console.log("Data is directly an array of slides");
-        } else if (data.slides && Array.isArray(data.slides)) {
-          // Alternative structure
-          slidesData = data.slides;
-          console.log("Found slides in data.slides");
-        } else {
-          console.error("Could not find slides in the data structure:", data);
-          throw new Error(
-            "Unexpected data format - couldn't locate slides array"
-          );
-        }
-
-        console.log("Extracted slides data:", slidesData);
+        console.log("Fetched slides data:", data[0]?.slides);
 
         // Process the slides into the format expected by the UI
-        if (slidesData && slidesData.length > 0) {
-          const processedSlides = processSlides(slidesData);
+        if (data[0]?.slides && Array.isArray(data[0].slides)) {
+          const processedSlides = processSlides(data[0].slides);
+          console.log("Processed slides:", processedSlides);
 
           if (processedSlides.length > 0) {
             setSlides(processedSlides);
@@ -279,11 +196,11 @@ const ContentPreview = () => {
             });
           }
         } else {
-          console.error("No slide data available");
+          console.error("Invalid slide data format received");
           toast({
-            title: "Warning",
-            description: "No slide data available",
-            variant: "warning",
+            title: "Error",
+            description: "Invalid slide data format",
+            variant: "destructive",
           });
         }
       } catch (error) {
@@ -293,26 +210,11 @@ const ContentPreview = () => {
           description: "Failed to fetch slides: " + error.message,
           variant: "destructive",
         });
-      } finally {
-        setLoading(false);
       }
     };
 
-    // Only fetch if authenticated
-    if (isAuthenticated) {
-      fetchData();
-    } else {
-      toast({
-        title: "Authentication Required",
-        description: "Please login to view course content",
-        variant: "destructive",
-      });
-      router.push(
-        "/auth/login?redirect=" +
-          encodeURIComponent(`/course/content-preview/${id}`)
-      );
-    }
-  }, [id, toast, router, isAuthenticated]);
+    fetchData();
+  }, [id, token, toast]);
 
   // Update slide section with history
   const updateSlideSection = useCallback(
@@ -391,19 +293,12 @@ const ContentPreview = () => {
   // Save slides
   const saveDraft = async () => {
     try {
-      // Get token from cookies
-      const token = Cookies.get("authToken");
-
       if (!token) {
         toast({
           title: "Authentication Error",
           description: "Please login to save your work",
           variant: "destructive",
         });
-        router.push(
-          "/auth/login?redirect=" +
-            encodeURIComponent(`/course/content-preview/${id}`)
-        );
         return;
       }
 
@@ -419,15 +314,6 @@ const ContentPreview = () => {
       const apiFormatSlides = convertToApiFormat(slides);
       console.log("Saving slides:", apiFormatSlides);
 
-      // Store original format for sending back to API
-      const presentationId = slides[0]?.presentation;
-
-      const requestBody = {
-        slides: apiFormatSlides,
-      };
-
-      console.log("Saving with request body:", requestBody);
-
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/courses/${id}/contents/`,
         {
@@ -436,26 +322,11 @@ const ContentPreview = () => {
             Authorization: `Token ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(requestBody),
-          credentials: "include", // Important for cross-origin requests with cookies
+          body: JSON.stringify({ slides: apiFormatSlides }),
         }
       );
 
-      if (!response.ok) {
-        if (response.status === 401 || response.status === 403) {
-          toast({
-            title: "Session Expired",
-            description: "Your session has expired. Please login again.",
-            variant: "destructive",
-          });
-          router.push(
-            "/auth/login?redirect=" +
-              encodeURIComponent(`/course/content-preview/${id}`)
-          );
-          return;
-        }
-        throw new Error("Failed to save draft");
-      }
+      if (!response.ok) throw new Error("Failed to save draft");
 
       toast({
         title: "Success",
@@ -470,18 +341,6 @@ const ContentPreview = () => {
       });
     }
   };
-
-  // Loading state
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading slides...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">

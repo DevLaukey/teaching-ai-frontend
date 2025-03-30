@@ -27,8 +27,10 @@ import {
   Undo,
   Redo,
   Stars,
+  MessageSquare,
   ThumbsUp,
   ThumbsDown,
+  Trash2,
   CheckCircle,
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";

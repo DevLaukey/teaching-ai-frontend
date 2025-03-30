@@ -27,8 +27,10 @@ import {
   Undo,
   Redo,
   Stars,
+  MessageSquare,
   ThumbsUp,
   ThumbsDown,
+  Trash2,
   CheckCircle,
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
@@ -52,20 +54,10 @@ const ContentPreview = () => {
   const processSlides = (rawSlides) => {
     console.log("Processing raw slides:", rawSlides);
 
-    if (!Array.isArray(rawSlides) || rawSlides.length === 0) {
-      console.error("Invalid slides data:", rawSlides);
-      return [];
-    }
-
     const processedSlides = [];
 
     // For each slide in the raw data
     for (const slide of rawSlides) {
-      if (!slide || !slide.title) {
-        console.warn("Skipping invalid slide:", slide);
-        continue;
-      }
-
       // Check if the title starts with "Slide" or contains ":**"
       const titleMatch = slide.title.match(/\*\*Slide (\d+):(.*?)\*\*/);
 
@@ -82,11 +74,7 @@ const ContentPreview = () => {
         const content = slide.content || "";
 
         // Look for bullet points or sections in the content
-        // Remove the leading "- " if present at the beginning
-        const cleanContent = content.startsWith("- ")
-          ? content.substring(2)
-          : content;
-        const contentParts = cleanContent.split(/\n-\s+/);
+        const contentParts = content.split(/\n-\s+/);
 
         // Extract main content, examples, and activity based on their position or keywords
         let mainContent = "";
@@ -97,22 +85,24 @@ const ContentPreview = () => {
         contentParts.forEach((part, index) => {
           part = part.trim();
 
-          // Determine the section based on content keywords
+          // If it's the first item and not already a bullet point, add the bullet
+          if (index === 0 && !part.startsWith("-")) {
+            part = part;
+          }
+
+          // Determine the section based on content
           if (
             part.toLowerCase().includes("example:") ||
-            part.toLowerCase().includes("examples:") ||
-            (index === 1 && part.toLowerCase().includes("example"))
+            part.toLowerCase().includes("examples:")
           ) {
             examples += part + "\n";
           } else if (
             part.toLowerCase().includes("interactive activity:") ||
-            part.toLowerCase().includes("activity:") ||
-            (index === 2 && part.toLowerCase().includes("activity"))
+            part.toLowerCase().includes("activity:")
           ) {
             interactiveActivity += part + "\n";
           } else if (part) {
             // Assume it's main content if not explicitly examples or activity
-            // This is typically the first part
             mainContent += part + "\n";
           }
         });
@@ -232,32 +222,19 @@ const ContentPreview = () => {
         const data = await response.json();
         console.log("Fetched data:", data);
 
-        // Handle different response formats - extract slides from the nested structure
+        // Handle different response formats
         let slidesData;
-        console.log("Extracted slides data:", data);
-
-        if (
-          Array.isArray(data) &&
-          data.length > 0 &&
-          data[0].slides &&
-          Array.isArray(data[0].slides)
-        ) {
-          // Format from your console output: array with nested slides array
-          slidesData = data[0].slides;
-          console.log("Found slides in data[0].slides:", slidesData);
-        } else if (Array.isArray(data)) {
+        if (Array.isArray(data)) {
           // If the response is an array of slides directly
           slidesData = data;
-          console.log("Data is directly an array of slides");
+        } else if (data[0]?.slides && Array.isArray(data[0].slides)) {
+          // If the response has slides nested in an object
+          slidesData = data[0].slides;
         } else if (data.slides && Array.isArray(data.slides)) {
           // Alternative structure
           slidesData = data.slides;
-          console.log("Found slides in data.slides");
         } else {
-          console.error("Could not find slides in the data structure:", data);
-          throw new Error(
-            "Unexpected data format - couldn't locate slides array"
-          );
+          throw new Error("Unexpected data format");
         }
 
         console.log("Extracted slides data:", slidesData);
@@ -419,15 +396,6 @@ const ContentPreview = () => {
       const apiFormatSlides = convertToApiFormat(slides);
       console.log("Saving slides:", apiFormatSlides);
 
-      // Store original format for sending back to API
-      const presentationId = slides[0]?.presentation;
-
-      const requestBody = {
-        slides: apiFormatSlides,
-      };
-
-      console.log("Saving with request body:", requestBody);
-
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/courses/${id}/contents/`,
         {
@@ -436,7 +404,7 @@ const ContentPreview = () => {
             Authorization: `Token ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(requestBody),
+          body: JSON.stringify({ slides: apiFormatSlides }),
           credentials: "include", // Important for cross-origin requests with cookies
         }
       );

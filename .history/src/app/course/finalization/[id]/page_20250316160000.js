@@ -37,8 +37,6 @@ import { useParams, useRouter } from "next/navigation";
 import Pptxgen from "pptxgenjs";
 import { Document, Packer, Paragraph, TextRun, HeadingLevel } from "docx";
 import { jsPDF } from "jspdf";
-import Cookies from "js-cookie";
-
 
 const CourseFinalization = () => {
   const router = useRouter();
@@ -67,7 +65,7 @@ const CourseFinalization = () => {
     const fetchCourseData = async () => {
       try {
         const response = await fetch(
-          process.env.NEXT_PUBLIC_BACKEND_URL + `/courses/${id}/contents/`,
+          process.env.NEXT_PUBLIC_BACKEND_URL + `/${id}/contents/`,
           {
             headers: {
               Authorization: `Token ${token}`,

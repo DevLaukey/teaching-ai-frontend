@@ -37,8 +37,6 @@ import { useParams, useRouter } from "next/navigation";
 import Pptxgen from "pptxgenjs";
 import { Document, Packer, Paragraph, TextRun, HeadingLevel } from "docx";
 import { jsPDF } from "jspdf";
-import Cookies from "js-cookie";
-
 
 const CourseFinalization = () => {
   const router = useRouter();
@@ -48,49 +46,35 @@ const CourseFinalization = () => {
   const [courseData, setCourseData] = useState(null);
   const [isExporting, setIsExporting] = useState(false);
   const token = Cookies.get("authToken");
+  
 
-  if (!token) {
-    toast({
-      title: "Authentication Error",
-      description: "Please login to view course content",
-      variant: "destructive",
-    });
-    router.push(
-      "/auth/login?redirect=" +
-        encodeURIComponent(`/course/content-preview/${id}`)
-    );
-    return;
-  }
+   if (!token) {
+     toast({
+       title: "Authentication Error",
+       description: "Please login to view course content",
+       variant: "destructive",
+     });
+     router.push(
+       "/auth/login?redirect=" +
+         encodeURIComponent(`/course/content-preview/${id}`)
+     );
+     return;
+   }
 
   // Fetch course data
   useEffect(() => {
     const fetchCourseData = async () => {
       try {
         const response = await fetch(
-          process.env.NEXT_PUBLIC_BACKEND_URL + `/courses/${id}/contents/`,
+          process.env.NEXT_PUBLIC_BACKEND_URL + `/${id}/contents/`,
           {
             headers: {
               Authorization: `Token ${token}`,
             },
-            credentials: "include", // Important for cross-origin requests with cookies
           }
         );
 
-        if (!response.ok) {
-          if (response.status === 401 || response.status === 403) {
-            toast({
-              title: "Session Expired",
-              description: "Your session has expired. Please login again.",
-              variant: "destructive",
-            });
-            router.push(
-              "/auth/login?redirect=" +
-                encodeURIComponent(`/course/content-preview/${id}`)
-            );
-            return;
-          }
-          throw new Error("Failed to fetch data");
-        }
+        if (!response.ok) throw new Error("Failed to fetch course data");
         const data = await response.json();
 
         console.log("Course data:", data);
