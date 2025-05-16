@@ -25,14 +25,9 @@ const isPublicPath = (path) => {
 export function middleware(request) {
   const { pathname } = request.nextUrl;
 
-  // Check if a token exists in cookies - use "authToken" (the name used in AuthContext)
-  const token = request.cookies.get("authToken")?.value;
+  // Check if a token exists in cookies
+  const token = request.cookies.get("token")?.value;
   const isAuthenticated = !!token;
-
-  // For debugging - log the authentication status and token (remove in production)
-  console.log(
-    `Path: ${pathname}, Auth Status: ${isAuthenticated}, Token exists: ${!!token}`
-  );
 
   // Allow access to public paths regardless of authentication status
   if (isPublicPath(pathname)) {

@@ -48,156 +48,129 @@ const ContentPreview = () => {
   const [currentHistoryIndex, setCurrentHistoryIndex] = useState(-1);
   const [loading, setLoading] = useState(true);
 
+  // Process raw slides into grouped format
+  const processSlides = (rawSlides) => {
+    console.log("Processing raw slides:", rawSlides);
 
-
-  // This function processes the raw slides from the API into a more usable format
-// Add this function to your ContentPreview component
-const processSlides = (rawSlides) => {
-  console.log("Processing raw slides:", rawSlides);
-
-  if (!Array.isArray(rawSlides) || rawSlides.length === 0) {
-    console.error("Invalid slides data:", rawSlides);
-    return [];
-  }
-
-  const processedSlides = [];
-  let currentMainSlide = null;
-
-  // Sort slides by order
-  const sortedSlides = [...rawSlides].sort((a, b) => a.order - b.order);
-
-  for (const slide of sortedSlides) {
-    if (!slide || !slide.title) {
-      console.warn("Skipping invalid slide:", slide);
-      continue;
+    if (!Array.isArray(rawSlides) || rawSlides.length === 0) {
+      console.error("Invalid slides data:", rawSlides);
+      return [];
     }
 
-    // Check if this is a main slide with a title like "Slide X: Title" or "### Slide X: Title"
-    if (slide.title.includes("Slide") || slide.title.startsWith("###")) {
-      // Save previous slide if exists
-      if (currentMainSlide) {
-        processedSlides.push(currentMainSlide);
+    const processedSlides = [];
+
+    // For each slide in the raw data
+    for (const slide of rawSlides) {
+      if (!slide || !slide.title) {
+        console.warn("Skipping invalid slide:", slide);
+        continue;
       }
-      
-      // Extract title - handle different formats
-      let slideTitle = "";
-      if (slide.title.includes("Slide")) {
-        const titleMatch = slide.title.match(/Slide \d+:\s*(.+)/) || 
-                          slide.title.match(/### Slide \d+:\s*(.+)/) ||
-                          slide.title.match(/\*\*Slide \d+:\s*(.+)\*\*/);
-        
+
+      // Check if the title starts with "Slide" or contains ":**"
+      const titleMatch = slide.title.match(/\*\*Slide (\d+):(.*?)\*\*/);
+
+      if (titleMatch || slide.title.includes("Slide")) {
+        // Extract the title - handle both formats
+        let slideTitle = "";
         if (titleMatch) {
-          slideTitle = titleMatch[1].trim();
+          slideTitle = titleMatch[2].trim();
         } else {
-          // Just remove formatting if we can't match the pattern
-          slideTitle = slide.title
-            .replace(/^### /, '')
-            .replace(/^\*\*/, '')
-            .replace(/\*\*$/, '')
-            .trim();
+          slideTitle = slide.title.replace(/^.*?Slide \d+:\s*/, "").trim();
         }
-      } else {
-        slideTitle = slide.title.replace(/^### /, '').trim();
-      }
-      
-      // Parse main content
-      let mainContent = slide.content || "";
-      if (mainContent.includes("Educational Content")) {
-        mainContent = mainContent.replace(/\*\*Educational Content:\*\*/i, "").trim();
-      }
-      
-      // Create new slide object
-      currentMainSlide = {
-        id: slide.id,
-        title: slideTitle,
-        mainContent: mainContent,
-        examples: "",
-        interactiveActivity: "",
-        fontFamily: slide.font_family || "arial",
-        fontSize: slide.font_size || "16",
-        layout: slide.layout || "default",
-        presentation: slide.presentation
-      };
-    } else if (slide.title.includes("Practical Examples")) {
-      // Add examples to current slide
-      if (currentMainSlide) {
-        currentMainSlide.examples = slide.content.trim();
-      }
-    } else if (slide.title.includes("Interactive Activity")) {
-      // Add interactive activity to current slide
-      if (currentMainSlide) {
-        // Extract activity content from title if present (after colon)
-        let activityPrompt = "";
-        if (slide.title.includes(":")) {
-          activityPrompt = slide.title.split(":")[1].trim();
-        }
-        
-        currentMainSlide.interactiveActivity = activityPrompt + 
-          (slide.content && slide.content.trim() ? 
-            (activityPrompt ? "\n" : "") + slide.content.trim() : "");
-      }
-    } else {
-      // Other content - could be a conclusion or miscellaneous
-      if (currentMainSlide) {
-        // Append to main content
-        const additionalContent = slide.title + 
-          (slide.content ? "\n" + slide.content : "");
-        
-        if (currentMainSlide.mainContent) {
-          currentMainSlide.mainContent += "\n\n" + additionalContent;
-        } else {
-          currentMainSlide.mainContent = additionalContent;
-        }
+
+        // Parse the content field which typically includes Content, Examples, and Activity
+        const content = slide.content || "";
+
+        // Look for bullet points or sections in the content
+        // Remove the leading "- " if present at the beginning
+        const cleanContent = content.startsWith("- ")
+          ? content.substring(2)
+          : content;
+        const contentParts = cleanContent.split(/\n-\s+/);
+
+        // Extract main content, examples, and activity based on their position or keywords
+        let mainContent = "";
+        let examples = "";
+        let interactiveActivity = "";
+
+        // Process each part of the content to identify what it contains
+        contentParts.forEach((part, index) => {
+          part = part.trim();
+
+          // Determine the section based on content keywords
+          if (
+            part.toLowerCase().includes("example:") ||
+            part.toLowerCase().includes("examples:") ||
+            (index === 1 && part.toLowerCase().includes("example"))
+          ) {
+            examples += part + "\n";
+          } else if (
+            part.toLowerCase().includes("interactive activity:") ||
+            part.toLowerCase().includes("activity:") ||
+            (index === 2 && part.toLowerCase().includes("activity"))
+          ) {
+            interactiveActivity += part + "\n";
+          } else if (part) {
+            // Assume it's main content if not explicitly examples or activity
+            // This is typically the first part
+            mainContent += part + "\n";
+          }
+        });
+
+        // Create processed slide object
+        processedSlides.push({
+          id: slide.id,
+          title: slideTitle,
+          mainContent: mainContent.trim(),
+          examples: examples.trim(),
+          interactiveActivity: interactiveActivity.trim(),
+          fontFamily: slide.font_family || "arial",
+          fontSize: slide.font_size || "16",
+          layout: slide.layout || "default",
+          presentation: slide.presentation,
+        });
       }
     }
-  }
-  
-  // Add the last slide if exists
-  if (currentMainSlide) {
-    processedSlides.push(currentMainSlide);
-  }
-  
-  console.log("Processed slides result:", processedSlides);
-  return processedSlides;
-};
 
-// Function to convert processed slides back to API format
-// This is important for saving the edits back to the server
-const convertToApiFormat = (processedSlides) => {
-  const apiSlides = [];
+    console.log("Processed slides result:", processedSlides);
+    return processedSlides;
+  };
 
-  for (let i = 0; i < processedSlides.length; i++) {
-    const slide = processedSlides[i];
-    const slideNumber = i + 1;
+  // Convert processed slides back to API format
+  const convertToApiFormat = (processedSlides) => {
+    const apiSlides = [];
 
-    // Format the title with "**Slide X: Title**" to match original format
-    const formattedTitle = `**Slide ${slideNumber}: ${slide.title}**`;
+    for (let i = 0; i < processedSlides.length; i++) {
+      const slide = processedSlides[i];
+      const slideNumber = i + 1;
 
-    // Build the content with the educational content format
-    let mainContent = "";
-    if (slide.mainContent) {
-      mainContent = `**Educational Content:**  \n${slide.mainContent}`;
-    }
+      // Format the title with "**Slide X: Title**" to match original format
+      const formattedTitle = `**Slide ${slideNumber}: ${slide.title}**`;
 
-    // Add the main slide
-    apiSlides.push({
-      id: slide.id || Date.now() + Math.random(),
-      order: slideNumber * 3 - 2, // Main content gets first position in order
-      title: formattedTitle,
-      content: mainContent,
-      font_family: slide.fontFamily,
-      font_size: slide.fontSize,
-      layout: slide.layout,
-      presentation: slide.presentation,
-    });
+      // Build the content with bullet points as in the original format
+      let fullContent = "";
 
-    // Add examples if present
-    if (slide.examples) {
+      // Add main content
+      if (slide.mainContent) {
+        fullContent += "- " + slide.mainContent + "\n";
+      }
+
+      // Add examples if present
+      if (slide.examples) {
+        fullContent += "- " + slide.examples + "\n";
+      }
+
+      // Add interactive activity if present
+      if (slide.interactiveActivity) {
+        fullContent += "- " + slide.interactiveActivity;
+      }
+
+      // Add the slide with all content in the same format as the API expects
       apiSlides.push({
-        id: slide.id ? slide.id + 0.1 : Date.now() + Math.random(),
-        order: slideNumber * 3 - 1, // Examples get second position in order
-        title: "**Practical Examples:**",
-        content: slide.examples,
+        id: slide.id || Date.now() + Math.random(),
+        order: slideNumber,
+        title: formattedTitle,
+        content: fullContent.trim(),
         font_family: slide.fontFamily,
         font_size: slide.fontSize,
         layout: slide.layout,
@@ -205,27 +178,8 @@ const convertToApiFormat = (processedSlides) => {
       });
     }
 
-    // Add interactive activity if present
-    if (slide.interactiveActivity) {
-      apiSlides.push({
-        id: slide.id ? slide.id + 0.2 : Date.now() + Math.random(),
-        order: slideNumber * 3, // Activity gets third position in order
-        title: `**Interactive Activity:** ${slide.interactiveActivity.split('\n')[0] || ""}`,
-        content: slide.interactiveActivity.includes('\n') 
-          ? slide.interactiveActivity.substring(slide.interactiveActivity.indexOf('\n') + 1) 
-          : "",
-        font_family: slide.fontFamily,
-        font_size: slide.fontSize,
-        layout: slide.layout,
-        presentation: slide.presentation,
-      });
-    }
-  }
-
-  return apiSlides;
-};
-
- 
+    return apiSlides;
+  };
 
   // Fetch slides data
   useEffect(() => {
@@ -259,8 +213,6 @@ const convertToApiFormat = (processedSlides) => {
           }
         );
 
-
-        console.log(response)
         if (!response.ok) {
           if (response.status === 401 || response.status === 403) {
             toast({

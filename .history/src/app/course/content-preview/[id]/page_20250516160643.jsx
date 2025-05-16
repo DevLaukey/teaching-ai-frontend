@@ -34,206 +34,252 @@ import {
 import { useParams, useRouter } from "next/navigation";
 import { useToast } from "../../../../hooks/use-toast";
 import { useAuth } from "../../../../lib/AuthContext";
-import Cookies from "js-cookie";
 
 const ContentPreview = () => {
   const router = useRouter();
   const { id } = useParams();
   const { toast } = useToast();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, getAuthToken } = useAuth();
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [slides, setSlides] = useState([]);
+  const [rawSlides, setRawSlides] = useState([]); // Store original slide data
   const [history, setHistory] = useState([]);
   const [currentHistoryIndex, setCurrentHistoryIndex] = useState(-1);
   const [loading, setLoading] = useState(true);
 
+  // Improved processSlides function to better handle various slide formats
+  const processSlides = (rawSlides) => {
+    console.log("Processing raw slides:", rawSlides);
 
-
-  // This function processes the raw slides from the API into a more usable format
-// Add this function to your ContentPreview component
-const processSlides = (rawSlides) => {
-  console.log("Processing raw slides:", rawSlides);
-
-  if (!Array.isArray(rawSlides) || rawSlides.length === 0) {
-    console.error("Invalid slides data:", rawSlides);
-    return [];
-  }
-
-  const processedSlides = [];
-  let currentMainSlide = null;
-
-  // Sort slides by order
-  const sortedSlides = [...rawSlides].sort((a, b) => a.order - b.order);
-
-  for (const slide of sortedSlides) {
-    if (!slide || !slide.title) {
-      console.warn("Skipping invalid slide:", slide);
-      continue;
+    if (!Array.isArray(rawSlides) || rawSlides.length === 0) {
+      console.error("Invalid slides data:", rawSlides);
+      return [];
     }
 
-    // Check if this is a main slide with a title like "Slide X: Title" or "### Slide X: Title"
-    if (slide.title.includes("Slide") || slide.title.startsWith("###")) {
-      // Save previous slide if exists
-      if (currentMainSlide) {
-        processedSlides.push(currentMainSlide);
+    const processedSlides = [];
+
+    // Group slides by title and content for better organization
+    let currentGroup = null;
+
+    for (const slide of rawSlides) {
+      // Skip separator slides
+      if (slide.title.includes("----") || !slide.title.trim()) {
+        continue;
       }
-      
-      // Extract title - handle different formats
-      let slideTitle = "";
-      if (slide.title.includes("Slide")) {
-        const titleMatch = slide.title.match(/Slide \d+:\s*(.+)/) || 
-                          slide.title.match(/### Slide \d+:\s*(.+)/) ||
-                          slide.title.match(/\*\*Slide \d+:\s*(.+)\*\*/);
-        
-        if (titleMatch) {
-          slideTitle = titleMatch[1].trim();
-        } else {
-          // Just remove formatting if we can't match the pattern
-          slideTitle = slide.title
-            .replace(/^### /, '')
-            .replace(/^\*\*/, '')
-            .replace(/\*\*$/, '')
-            .trim();
+
+      // Check if this is a title slide (starting with "**Slide")
+      if (slide.title.includes("**Slide")) {
+        // If we have a previous group, add it to processed slides
+        if (currentGroup) {
+          processedSlides.push(currentGroup);
         }
-      } else {
-        slideTitle = slide.title.replace(/^### /, '').trim();
+
+        // Extract slide number and title
+        const titleMatch = slide.title.match(/\*\*Slide (\d+):(.*?)\*\*/);
+        let slideTitle = titleMatch ? titleMatch[2].trim() : slide.title.trim();
+
+        // Create a new group
+        currentGroup = {
+          id: slide.id,
+          title: slideTitle,
+          mainContent: "",
+          examples: "",
+          interactiveActivity: "",
+          fontFamily: slide.font_family || "arial",
+          fontSize: slide.font_size || "16",
+          layout: slide.layout || "default",
+          presentation: slide.presentation,
+          order: parseInt(titleMatch ? titleMatch[1] : 0, 10),
+        };
       }
-      
-      // Parse main content
-      let mainContent = slide.content || "";
-      if (mainContent.includes("Educational Content")) {
-        mainContent = mainContent.replace(/\*\*Educational Content:\*\*/i, "").trim();
-      }
-      
-      // Create new slide object
-      currentMainSlide = {
-        id: slide.id,
-        title: slideTitle,
-        mainContent: mainContent,
-        examples: "",
-        interactiveActivity: "",
-        fontFamily: slide.font_family || "arial",
-        fontSize: slide.font_size || "16",
-        layout: slide.layout || "default",
-        presentation: slide.presentation
-      };
-    } else if (slide.title.includes("Practical Examples")) {
-      // Add examples to current slide
-      if (currentMainSlide) {
-        currentMainSlide.examples = slide.content.trim();
-      }
-    } else if (slide.title.includes("Interactive Activity")) {
-      // Add interactive activity to current slide
-      if (currentMainSlide) {
-        // Extract activity content from title if present (after colon)
-        let activityPrompt = "";
-        if (slide.title.includes(":")) {
-          activityPrompt = slide.title.split(":")[1].trim();
+      // Check if this is a content slide
+      else if (currentGroup) {
+        const title = slide.title.toLowerCase();
+        const content = slide.content || "";
+
+        // Determine section based on title keywords
+        if (title.startsWith("content:")) {
+          currentGroup.mainContent += (
+            title.replace("content:", "").trim() +
+            "\n" +
+            content
+          ).trim();
+        } else if (title.includes("examples:") || title === "examples:") {
+          currentGroup.examples +=
+            (title.includes("examples:")
+              ? title.replace("examples:", "").trim() + "\n"
+              : "") + content;
+        } else if (title.includes("activity:") || title === "activity:") {
+          currentGroup.interactiveActivity += (title + "\n" + content).trim();
         }
-        
-        currentMainSlide.interactiveActivity = activityPrompt + 
-          (slide.content && slide.content.trim() ? 
-            (activityPrompt ? "\n" : "") + slide.content.trim() : "");
-      }
-    } else {
-      // Other content - could be a conclusion or miscellaneous
-      if (currentMainSlide) {
-        // Append to main content
-        const additionalContent = slide.title + 
-          (slide.content ? "\n" + slide.content : "");
-        
-        if (currentMainSlide.mainContent) {
-          currentMainSlide.mainContent += "\n\n" + additionalContent;
-        } else {
-          currentMainSlide.mainContent = additionalContent;
+        // Add other content that doesn't have a clear section indicator to main content
+        else {
+          currentGroup.mainContent +=
+            (currentGroup.mainContent ? "\n" : "") +
+            (title + "\n" + content).trim();
         }
       }
     }
-  }
-  
-  // Add the last slide if exists
-  if (currentMainSlide) {
-    processedSlides.push(currentMainSlide);
-  }
-  
-  console.log("Processed slides result:", processedSlides);
-  return processedSlides;
-};
 
-// Function to convert processed slides back to API format
-// This is important for saving the edits back to the server
-const convertToApiFormat = (processedSlides) => {
-  const apiSlides = [];
-
-  for (let i = 0; i < processedSlides.length; i++) {
-    const slide = processedSlides[i];
-    const slideNumber = i + 1;
-
-    // Format the title with "**Slide X: Title**" to match original format
-    const formattedTitle = `**Slide ${slideNumber}: ${slide.title}**`;
-
-    // Build the content with the educational content format
-    let mainContent = "";
-    if (slide.mainContent) {
-      mainContent = `**Educational Content:**  \n${slide.mainContent}`;
+    // Add the last group if it exists
+    if (currentGroup) {
+      processedSlides.push(currentGroup);
     }
 
-    // Add the main slide
-    apiSlides.push({
-      id: slide.id || Date.now() + Math.random(),
-      order: slideNumber * 3 - 2, // Main content gets first position in order
-      title: formattedTitle,
-      content: mainContent,
-      font_family: slide.fontFamily,
-      font_size: slide.fontSize,
-      layout: slide.layout,
-      presentation: slide.presentation,
+    // Sort slides by order if available
+    processedSlides.sort((a, b) => (a.order || 0) - (b.order || 0));
+
+    console.log("Processed slides result:", processedSlides);
+    return processedSlides;
+  };
+
+  // Preserve raw slide data format for saving back to API
+  const convertToApiFormat = (processedSlides) => {
+    // If we have raw slides, use them as the base structure
+    if (rawSlides.length > 0) {
+      // Create a copy of raw slides to modify
+      const updatedRawSlides = [...rawSlides];
+
+      // For each processed slide, update the corresponding raw slides
+      processedSlides.forEach((processedSlide) => {
+        // Find all raw slides associated with this processed slide's ID
+        const titleSlideIndex = updatedRawSlides.findIndex(
+          (raw) => raw.id === processedSlide.id
+        );
+
+        if (titleSlideIndex >= 0) {
+          // Update the title slide
+          const titleSlide = updatedRawSlides[titleSlideIndex];
+          updatedRawSlides[titleSlideIndex] = {
+            ...titleSlide,
+            title: `**Slide ${processedSlide.order || titleSlide.order}: ${
+              processedSlide.title
+            }**`,
+            font_family: processedSlide.fontFamily,
+            font_size: processedSlide.fontSize,
+            layout: processedSlide.layout,
+          };
+
+          // Look for content slides after the title slide
+          // This assumes content slides follow title slides in order
+          let contentIndex = titleSlideIndex + 1;
+          while (
+            contentIndex < updatedRawSlides.length &&
+            !updatedRawSlides[contentIndex].title.includes("**Slide")
+          ) {
+            const contentSlide = updatedRawSlides[contentIndex];
+
+            // Update font properties
+            updatedRawSlides[contentIndex] = {
+              ...contentSlide,
+              font_family: processedSlide.fontFamily,
+              font_size: processedSlide.fontSize,
+              layout: processedSlide.layout,
+            };
+
+            // Update content if we can identify the slide type
+            if (contentSlide.title.toLowerCase().includes("content:")) {
+              updatedRawSlides[contentIndex].content =
+                processedSlide.mainContent;
+            } else if (contentSlide.title.toLowerCase().includes("examples:")) {
+              updatedRawSlides[contentIndex].content = processedSlide.examples;
+            } else if (contentSlide.title.toLowerCase().includes("activity:")) {
+              updatedRawSlides[contentIndex].content =
+                processedSlide.interactiveActivity;
+            }
+
+            contentIndex++;
+          }
+        }
+      });
+
+      return updatedRawSlides;
+    }
+
+    // Fallback: create new slide format if we don't have raw slides
+    const apiSlides = [];
+
+    processedSlides.forEach((slide, index) => {
+      const slideNumber = index + 1;
+
+      // Add title slide
+      apiSlides.push({
+        id: slide.id || Date.now() + Math.random(),
+        order: slideNumber,
+        title: `**Slide ${slideNumber}: ${slide.title}**`,
+        content: "",
+        font_family: slide.fontFamily,
+        font_size: slide.fontSize,
+        layout: slide.layout,
+        presentation: slide.presentation,
+      });
+
+      // Add content slide
+      if (slide.mainContent) {
+        apiSlides.push({
+          id: Date.now() + Math.random(),
+          order: slideNumber + 0.1,
+          title: "Content:",
+          content: slide.mainContent,
+          font_family: slide.fontFamily,
+          font_size: slide.fontSize,
+          layout: slide.layout,
+          presentation: slide.presentation,
+        });
+      }
+
+      // Add examples slide
+      if (slide.examples) {
+        apiSlides.push({
+          id: Date.now() + Math.random(),
+          order: slideNumber + 0.2,
+          title: "Examples:",
+          content: slide.examples,
+          font_family: slide.fontFamily,
+          font_size: slide.fontSize,
+          layout: slide.layout,
+          presentation: slide.presentation,
+        });
+      }
+
+      // Add activity slide
+      if (slide.interactiveActivity) {
+        apiSlides.push({
+          id: Date.now() + Math.random(),
+          order: slideNumber + 0.3,
+          title: "Activity:",
+          content: slide.interactiveActivity,
+          font_family: slide.fontFamily,
+          font_size: slide.fontSize,
+          layout: slide.layout,
+          presentation: slide.presentation,
+        });
+      }
+
+      // Add separator
+      apiSlides.push({
+        id: Date.now() + Math.random(),
+        order: slideNumber + 0.9,
+        title: "--------------------------------------------",
+        content: "",
+        font_family: slide.fontFamily,
+        font_size: slide.fontSize,
+        layout: slide.layout,
+        presentation: slide.presentation,
+      });
     });
 
-    // Add examples if present
-    if (slide.examples) {
-      apiSlides.push({
-        id: slide.id ? slide.id + 0.1 : Date.now() + Math.random(),
-        order: slideNumber * 3 - 1, // Examples get second position in order
-        title: "**Practical Examples:**",
-        content: slide.examples,
-        font_family: slide.fontFamily,
-        font_size: slide.fontSize,
-        layout: slide.layout,
-        presentation: slide.presentation,
-      });
-    }
-
-    // Add interactive activity if present
-    if (slide.interactiveActivity) {
-      apiSlides.push({
-        id: slide.id ? slide.id + 0.2 : Date.now() + Math.random(),
-        order: slideNumber * 3, // Activity gets third position in order
-        title: `**Interactive Activity:** ${slide.interactiveActivity.split('\n')[0] || ""}`,
-        content: slide.interactiveActivity.includes('\n') 
-          ? slide.interactiveActivity.substring(slide.interactiveActivity.indexOf('\n') + 1) 
-          : "",
-        font_family: slide.fontFamily,
-        font_size: slide.fontSize,
-        layout: slide.layout,
-        presentation: slide.presentation,
-      });
-    }
-  }
-
-  return apiSlides;
-};
-
- 
+    return apiSlides;
+  };
 
   // Fetch slides data
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // Get token from cookies instead of localStorage
-        const token = Cookies.get("authToken");
+        // Get token using the getAuthToken function from context
+        const token = getAuthToken();
 
         if (!token) {
           toast({
@@ -248,6 +294,8 @@ const convertToApiFormat = (processedSlides) => {
           return;
         }
 
+        console.log("Using token to fetch course content:", token);
+
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/courses/${id}/contents/`,
           {
@@ -259,8 +307,8 @@ const convertToApiFormat = (processedSlides) => {
           }
         );
 
+        console.log("Content fetch response:", response);
 
-        console.log(response)
         if (!response.ok) {
           if (response.status === 401 || response.status === 403) {
             toast({
@@ -282,7 +330,6 @@ const convertToApiFormat = (processedSlides) => {
 
         // Handle different response formats - extract slides from the nested structure
         let slidesData;
-        console.log("Extracted slides data:", data);
 
         if (
           Array.isArray(data) &&
@@ -308,7 +355,8 @@ const convertToApiFormat = (processedSlides) => {
           );
         }
 
-        console.log("Extracted slides data:", slidesData);
+        // Store raw slides for saving back to API
+        setRawSlides(slidesData);
 
         // Process the slides into the format expected by the UI
         if (slidesData && slidesData.length > 0) {
@@ -360,7 +408,7 @@ const convertToApiFormat = (processedSlides) => {
           encodeURIComponent(`/course/content-preview/${id}`)
       );
     }
-  }, [id, toast, router, isAuthenticated]);
+  }, [id, toast, router, isAuthenticated, getAuthToken]);
 
   // Update slide section with history
   const updateSlideSection = useCallback(
@@ -418,6 +466,7 @@ const convertToApiFormat = (processedSlides) => {
       fontSize: "16",
       layout: "default",
       presentation: slides[0]?.presentation || null,
+      order: slides.length + 1,
     };
 
     setSlides((prevSlides) => {
@@ -439,8 +488,8 @@ const convertToApiFormat = (processedSlides) => {
   // Save slides
   const saveDraft = async () => {
     try {
-      // Get token from cookies
-      const token = Cookies.get("authToken");
+      // Get token using the getAuthToken function from context
+      const token = getAuthToken();
 
       if (!token) {
         toast({
@@ -467,9 +516,6 @@ const convertToApiFormat = (processedSlides) => {
       const apiFormatSlides = convertToApiFormat(slides);
       console.log("Saving slides:", apiFormatSlides);
 
-      // Store original format for sending back to API
-      const presentationId = slides[0]?.presentation;
-
       const requestBody = {
         slides: apiFormatSlides,
       };
@@ -488,6 +534,8 @@ const convertToApiFormat = (processedSlides) => {
           credentials: "include", // Important for cross-origin requests with cookies
         }
       );
+
+      console.log("Save response:", response);
 
       if (!response.ok) {
         if (response.status === 401 || response.status === 403) {
