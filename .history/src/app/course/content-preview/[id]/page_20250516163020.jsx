@@ -377,7 +377,7 @@ const convertToApiFormat = (processedSlides) => {
           [section]: value,
         };
 
-        // Update history for undo/redo functionality
+        // Update history
         const newHistory = [
           ...history.slice(0, currentHistoryIndex + 1),
           newSlides,

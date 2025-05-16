@@ -410,22 +410,9 @@ const CourseFinalization = () => {
       setExportProgress(10);
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      // Format slides
-      let formattedSlides = formatSlidesForExport();
-
-      // If no slides, create a default slide with the course title
+      const formattedSlides = formatSlidesForExport();
       if (formattedSlides.length === 0) {
-        if (!courseData?.title) {
-          throw new Error("No course title or slide content to export");
-        }
-
-        formattedSlides.push({
-          slideNumber: 1,
-          title: courseData.title,
-          content: ["This course doesn't contain any specific slide content."],
-          examples: [],
-          interactiveActivity: "",
-        });
+        throw new Error("No content to export");
       }
 
       setExportProgress(30);
@@ -554,22 +541,9 @@ const CourseFinalization = () => {
       setExportProgress(10);
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      // Format slides
-      let formattedSlides = formatSlidesForExport();
-
-      // If no slides, create a default slide with the course title
+      const formattedSlides = formatSlidesForExport();
       if (formattedSlides.length === 0) {
-        if (!courseData?.title) {
-          throw new Error("No course title or slide content to export");
-        }
-
-        formattedSlides.push({
-          slideNumber: 1,
-          title: courseData.title,
-          content: ["This course doesn't contain any specific slide content."],
-          examples: [],
-          interactiveActivity: "",
-        });
+        throw new Error("No content to export");
       }
 
       setExportProgress(30);

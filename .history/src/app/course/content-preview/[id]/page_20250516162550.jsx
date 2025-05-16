@@ -377,7 +377,7 @@ const convertToApiFormat = (processedSlides) => {
           [section]: value,
         };
 
-        // Update history for undo/redo functionality
+        // Update history
         const newHistory = [
           ...history.slice(0, currentHistoryIndex + 1),
           newSlides,
@@ -408,11 +408,9 @@ const convertToApiFormat = (processedSlides) => {
 
   // Add a new slide
   const addNewSlide = () => {
-    const newSlideNumber = slides.length + 1;
-
     const newSlide = {
       id: Date.now() + Math.random(),
-      title: `New Slide ${newSlideNumber}`,
+      title: `New Slide ${slides.length + 1}`,
       mainContent: "",
       examples: "",
       interactiveActivity: "",
@@ -424,15 +422,13 @@ const convertToApiFormat = (processedSlides) => {
 
     setSlides((prevSlides) => {
       const newSlides = [...prevSlides, newSlide];
-
-      // Update history for undo/redo
+      // Update history
       const newHistory = [
         ...history.slice(0, currentHistoryIndex + 1),
         newSlides,
       ];
       setHistory(newHistory);
       setCurrentHistoryIndex(currentHistoryIndex + 1);
-
       return newSlides;
     });
 
@@ -599,79 +595,60 @@ const convertToApiFormat = (processedSlides) => {
                         </div>
 
                         <div>
-                          <Tabs defaultValue="content" className="w-full">
-                            <TabsList className="w-full grid grid-cols-3">
-                              <TabsTrigger value="content">
-                                Main Content
-                              </TabsTrigger>
-                              <TabsTrigger value="examples">
-                                Examples
-                              </TabsTrigger>
-                              <TabsTrigger value="activity">
-                                Activity
-                              </TabsTrigger>
-                            </TabsList>
+                          <label className="block text-sm font-medium mb-2">
+                            Main Content
+                          </label>
+                          <Textarea
+                            className="min-h-[100px]"
+                            value={slides[currentSlide].mainContent}
+                            onChange={(e) =>
+                              updateSlideSection("mainContent", e.target.value)
+                            }
+                            placeholder="Main content"
+                            style={{
+                              fontFamily: slides[currentSlide].fontFamily,
+                              fontSize: `${slides[currentSlide].fontSize}px`,
+                            }}
+                          />
+                        </div>
 
-                            <TabsContent value="content" className="pt-4">
-                              <label className="block text-sm font-medium mb-2">
-                                Main Content
-                              </label>
-                              <Textarea
-                                className="min-h-[200px]"
-                                value={slides[currentSlide].mainContent}
-                                onChange={(e) =>
-                                  updateSlideSection(
-                                    "mainContent",
-                                    e.target.value
-                                  )
-                                }
-                                placeholder="Main educational content for this slide"
-                                style={{
-                                  fontFamily: slides[currentSlide].fontFamily,
-                                  fontSize: `${slides[currentSlide].fontSize}px`,
-                                }}
-                              />
-                            </TabsContent>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Examples
+                          </label>
+                          <Textarea
+                            className="min-h-[100px]"
+                            value={slides[currentSlide].examples}
+                            onChange={(e) =>
+                              updateSlideSection("examples", e.target.value)
+                            }
+                            placeholder="Examples"
+                            style={{
+                              fontFamily: slides[currentSlide].fontFamily,
+                              fontSize: `${slides[currentSlide].fontSize}px`,
+                            }}
+                          />
+                        </div>
 
-                            <TabsContent value="examples" className="pt-4">
-                              <label className="block text-sm font-medium mb-2">
-                                Practical Examples
-                              </label>
-                              <Textarea
-                                className="min-h-[200px]"
-                                value={slides[currentSlide].examples}
-                                onChange={(e) =>
-                                  updateSlideSection("examples", e.target.value)
-                                }
-                                placeholder="Provide practical examples related to this slide's content"
-                                style={{
-                                  fontFamily: slides[currentSlide].fontFamily,
-                                  fontSize: `${slides[currentSlide].fontSize}px`,
-                                }}
-                              />
-                            </TabsContent>
-
-                            <TabsContent value="activity" className="pt-4">
-                              <label className="block text-sm font-medium mb-2">
-                                Interactive Activity
-                              </label>
-                              <Textarea
-                                className="min-h-[200px]"
-                                value={slides[currentSlide].interactiveActivity}
-                                onChange={(e) =>
-                                  updateSlideSection(
-                                    "interactiveActivity",
-                                    e.target.value
-                                  )
-                                }
-                                placeholder="Add an interactive activity or question for students"
-                                style={{
-                                  fontFamily: slides[currentSlide].fontFamily,
-                                  fontSize: `${slides[currentSlide].fontSize}px`,
-                                }}
-                              />
-                            </TabsContent>
-                          </Tabs>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Interactive Activity
+                          </label>
+                          <Textarea
+                            className="min-h-[100px]"
+                            value={slides[currentSlide].interactiveActivity}
+                            onChange={(e) =>
+                              updateSlideSection(
+                                "interactiveActivity",
+                                e.target.value
+                              )
+                            }
+                            placeholder="Interactive activity"
+                            style={{
+                              fontFamily: slides[currentSlide].fontFamily,
+                              fontSize: `${slides[currentSlide].fontSize}px`,
+                            }}
+                          />
                         </div>
                       </div>
                     ) : (

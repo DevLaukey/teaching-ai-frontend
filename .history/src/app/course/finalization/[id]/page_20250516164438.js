@@ -121,23 +121,6 @@ const CourseFinalization = () => {
       .toLowerCase();
   };
 
-  // Helper function to trigger file download
-  const downloadFile = (blob, filename) => {
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    // Append to the document body to work in Firefox
-    document.body.appendChild(a);
-    // Trigger click
-    a.click();
-    // Remove after a short timeout to ensure download starts
-    setTimeout(() => {
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-    }, 200);
-  };
-
   // Improved slides format function with better error handling
   const formatSlidesForExport = () => {
     if (
@@ -374,9 +357,22 @@ const CourseFinalization = () => {
       // Create a safe filename
       const safeFileName = createSafeFilename(courseData.title);
 
-      // Use blob approach for consistent download experience across browsers
-      const blob = await pptx.write("blob");
-      downloadFile(blob, `${safeFileName}.pptx`);
+      // Save the presentation with try-catch for browser compatibility
+      try {
+        await pptx.writeFile(`${safeFileName}.pptx`);
+      } catch (writeError) {
+        console.error("PPTX write error:", writeError);
+        // Fallback for browsers that block direct downloads
+        const blob = await pptx.write("blob");
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${safeFileName}.pptx`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      }
 
       setExportProgress(100);
 
@@ -410,22 +406,9 @@ const CourseFinalization = () => {
       setExportProgress(10);
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      // Format slides
-      let formattedSlides = formatSlidesForExport();
-
-      // If no slides, create a default slide with the course title
+      const formattedSlides = formatSlidesForExport();
       if (formattedSlides.length === 0) {
-        if (!courseData?.title) {
-          throw new Error("No course title or slide content to export");
-        }
-
-        formattedSlides.push({
-          slideNumber: 1,
-          title: courseData.title,
-          content: ["This course doesn't contain any specific slide content."],
-          examples: [],
-          interactiveActivity: "",
-        });
+        throw new Error("No content to export");
       }
 
       setExportProgress(30);
@@ -520,7 +503,16 @@ const CourseFinalization = () => {
       const blob = new Blob([buffer], {
         type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       });
-      downloadFile(blob, `${safeFileName}.docx`);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${safeFileName}.docx`;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      }, 100);
 
       setExportProgress(100);
 
@@ -554,22 +546,9 @@ const CourseFinalization = () => {
       setExportProgress(10);
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      // Format slides
-      let formattedSlides = formatSlidesForExport();
-
-      // If no slides, create a default slide with the course title
+      const formattedSlides = formatSlidesForExport();
       if (formattedSlides.length === 0) {
-        if (!courseData?.title) {
-          throw new Error("No course title or slide content to export");
-        }
-
-        formattedSlides.push({
-          slideNumber: 1,
-          title: courseData.title,
-          content: ["This course doesn't contain any specific slide content."],
-          examples: [],
-          interactiveActivity: "",
-        });
+        throw new Error("No content to export");
       }
 
       setExportProgress(30);
@@ -662,9 +641,8 @@ const CourseFinalization = () => {
       // Create a safe filename
       const safeFileName = createSafeFilename(courseData.title);
 
-      // Create a blob from the PDF and trigger download
-      const pdfBlob = pdf.output("blob");
-      downloadFile(pdfBlob, `${safeFileName}.pdf`);
+      // Save the PDF
+      pdf.save(`${safeFileName}.pdf`);
 
       setExportProgress(100);
 
