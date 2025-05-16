@@ -9,13 +9,23 @@ import {
   CardTitle,
   CardDescription,
 } from "../../components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../../components/ui/tabs";
 import { Upload, Eye, EyeOff, Check } from "lucide-react";
 import { useToast } from "../../hooks/use-toast";
+import Cookies from "js-cookie"; // Import js-cookie
+import { useAuth } from "../../lib/AuthContext"; // Import useAuth hook
 
 const SettingsProfile = () => {
   const { toast } = useToast();
-  const token = localStorage.getItem("token");
+  const { user } = useAuth(); // Use the Auth context
+
+  // Get token from cookies instead of localStorage
+  const token = Cookies.get("authToken");
 
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -50,8 +60,6 @@ const SettingsProfile = () => {
           }
         );
 
-    
-
         console.log("response", response);
         if (response.ok) {
           const data = await response.json();
@@ -74,7 +82,19 @@ const SettingsProfile = () => {
     };
 
     fetchUserDetails();
-  }, []);
+  }, [token, toast]);
+
+  // Option: Use data from Auth context if available
+  useEffect(() => {
+    if (user) {
+      setUserDetails((prevDetails) => ({
+        ...prevDetails,
+        first_name: user.first_name || prevDetails.first_name,
+        last_name: user.last_name || prevDetails.last_name,
+        email: user.email || prevDetails.email,
+      }));
+    }
+  }, [user]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -87,7 +107,9 @@ const SettingsProfile = () => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token");
+      // Get token from cookies instead of localStorage
+      const token = Cookies.get("authToken");
+
       if (!token) {
         throw new Error("No authentication token found");
       }
@@ -115,7 +137,7 @@ const SettingsProfile = () => {
         }
       );
 
-      console.log("casd", response);
+      console.log("Response:", response);
       if (response.ok) {
         toast({
           title: "Success",

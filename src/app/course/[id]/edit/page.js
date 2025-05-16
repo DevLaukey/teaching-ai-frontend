@@ -5,7 +5,12 @@ import { useParams, useRouter } from "next/navigation";
 import { Button } from "../../../../components/ui/button";
 import { Input } from "../../../../components/ui/input";
 import { Textarea } from "../../../../components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../../../components/ui/card";
 import {
   Select,
   SelectContent,
@@ -26,6 +31,7 @@ import { Loader2, Save, ArrowLeft, Upload, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAuth } from "../../../../lib/AuthContext"; // Import useAuth hook
 
 // Define the form schema
 const formSchema = z.object({
@@ -37,14 +43,18 @@ const formSchema = z.object({
   details: z.string().optional(),
   media: z.any().optional(),
 });
+
 const EditCoursePage = () => {
   const param = useParams();
   const router = useRouter();
   const id = param.id;
   const { toast } = useToast();
+  const { getAuthToken } = useAuth(); // Use the Auth context with getAuthToken
+
   const [mediaPreview, setMediaPreview] = useState(null);
   const [existingMedia, setExistingMedia] = useState(null);
-const [mediaType, setMediaType] = useState(null);
+  const [mediaType, setMediaType] = useState(null);
+
   // Initialize form
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -62,10 +72,14 @@ const [mediaType, setMediaType] = useState(null);
   // Fetch course data
   const fetchCourseData = async () => {
     try {
-      const token = localStorage.getItem("token");
+      // Get token using the getAuthToken function from context
+      const token = getAuthToken();
+
       if (!token) {
         throw new Error("No authentication token found");
       }
+
+      console.log("Using token for course fetch:", token);
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/${id}/`,
@@ -83,6 +97,8 @@ const [mediaType, setMediaType] = useState(null);
       }
 
       const data = await response.json();
+      console.log("Course data received:", data);
+
       // Reset form with fetched data
       form.reset({
         subject: data.subject || "",
@@ -112,7 +128,7 @@ const [mediaType, setMediaType] = useState(null);
 
   useEffect(() => {
     fetchCourseData();
-  }, [id]);
+  }, [id, getAuthToken]);
 
   const handleMediaChange = (e, field) => {
     const file = e.target.files[0];
@@ -127,7 +143,6 @@ const [mediaType, setMediaType] = useState(null);
       setExistingMedia(null); // Clear existing media when new file is selected
     }
   };
-
 
   const renderMediaPreview = () => {
     if (mediaPreview) {
@@ -162,7 +177,6 @@ const [mediaType, setMediaType] = useState(null);
     return null;
   };
 
-
   const clearMedia = () => {
     form.setValue("media", null);
     setMediaPreview(null);
@@ -173,10 +187,14 @@ const [mediaType, setMediaType] = useState(null);
   // Submit handler
   const onSubmit = async (values) => {
     try {
-      const token = localStorage.getItem("token");
+      // Get token using the getAuthToken function from context
+      const token = getAuthToken();
+
       if (!token) {
         throw new Error("No authentication token found");
       }
+
+      console.log("Using token for course update:", token);
 
       // Create FormData for multipart/form-data submission
       const formData = new FormData();
@@ -188,6 +206,14 @@ const [mediaType, setMediaType] = useState(null);
         }
       });
 
+      // Log what we're sending (leave out the media file for brevity)
+      console.log(
+        "Updating course with data:",
+        Object.fromEntries(
+          Object.entries(values).filter(([key]) => key !== "media")
+        )
+      );
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/${id}/`,
         {
@@ -198,6 +224,8 @@ const [mediaType, setMediaType] = useState(null);
           body: formData,
         }
       );
+
+      console.log("Course update response status:", response.status);
 
       if (!response.ok) {
         throw new Error("Failed to update course");
@@ -409,7 +437,7 @@ const [mediaType, setMediaType] = useState(null);
                             onChange={(e) => handleMediaChange(e, field)}
                             className="hidden"
                             id="media-upload"
-                          /> 
+                          />
                           <label
                             htmlFor="media-upload"
                             className="cursor-pointer text-xs sm:text-sm text-gray-600 hover:text-gray-800 text-center"

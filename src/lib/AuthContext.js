@@ -13,6 +13,7 @@ export function AuthProvider({ children }) {
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   // Helper function to set auth token in cookies
+  // From your AuthContext.js
   const setAuthToken = (token) => {
     if (token) {
       // Set in js-cookie (for client-side usage)
