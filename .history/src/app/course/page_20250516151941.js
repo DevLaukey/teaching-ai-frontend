@@ -94,6 +94,7 @@ const MyCourses = () => {
 
       const data = await response.json();
 
+      console.log(data);
       // Transform the API data to match our component's expected format
       const transformedCourses = data.map((course) => ({
         id: course.id,

@@ -35,6 +35,7 @@ import {
 import { useRouter } from "next/navigation";
 import Navigation from "../../components/Navbar";
 import { useAuth } from "../../lib/AuthContext";
+import Cookies from "js-cookie"; // Import js-cookie
 
 const Dashboard = () => {
   const router = useRouter();
@@ -124,7 +125,9 @@ const Dashboard = () => {
 
   const fetchCourses = async () => {
     try {
-      const token = localStorage.getItem("token");
+      // Get token from cookies instead of localStorage
+      const token = Cookies.get("authToken");
+
       if (!token) {
         throw new Error("No authentication token found");
       }

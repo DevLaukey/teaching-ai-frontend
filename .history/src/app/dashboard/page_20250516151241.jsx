@@ -1,7 +1,12 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Button } from "../../components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,15 +33,26 @@ import {
   HelpCircle,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Navigation from "../../components/Navbar";
+import { useAuth } from "../../lib/AuthContext";
+import Cookies from "js-cookie"; // Import js-cookie
 
 const Dashboard = () => {
   const router = useRouter();
+  const { user, logout, isAuthenticated, loading } = useAuth();
 
   const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [recentCourses, setRecentCourses] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  // Check if user is authenticated before loading data
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.push("/auth/login");
+    }
+  }, [isAuthenticated, loading, router]);
 
   // Function to get recent courses
   const getRecentCourses = (allCourses) => {
@@ -101,23 +117,31 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    fetchCourses();
-  }, []);
+    // Only fetch courses if the user is authenticated
+    if (!loading && isAuthenticated) {
+      fetchCourses();
+    }
+  }, [isAuthenticated, loading]);
 
   const fetchCourses = async () => {
     try {
-      const token = localStorage.getItem("token");
+      // Get token from cookies instead of localStorage
+      const token = Cookies.get("authToken");
+
       if (!token) {
         throw new Error("No authentication token found");
       }
 
-      const response = await fetch(process.env.NEXT_PUBLIC_BACKEND_URL, {
-        method: "GET",
-        headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/courses`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch courses");
@@ -127,25 +151,19 @@ const Dashboard = () => {
       setCourses(data);
       setRecentCourses(getRecentCourses(data));
       setRecentActivity(getRecentActivity(data));
-      setLoading(false);
     } catch (err) {
       setError(err.message);
-      setLoading(false);
+    } finally {
+      setDataLoading(false);
     }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("isAuthenticated");
-    localStorage.removeItem("userProfile");
-    router.push("/auth/login");
   };
 
   const handleCourseClick = (courseId) => {
     router.push(`/course/${courseId}`);
   };
 
-  if (loading) {
+  // Show loading state while checking authentication or fetching data
+  if (loading || (isAuthenticated && dataLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -153,12 +171,18 @@ const Dashboard = () => {
     );
   }
 
+  // Show error message if there's an error
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-red-500">Error: {error}</div>
       </div>
     );
+  }
+
+  // Redirect handled by the useEffect, so nothing to render if not authenticated
+  if (!isAuthenticated) {
+    return null;
   }
 
   const publishedCourses = courses.filter((course) => course.is_published);
@@ -170,61 +194,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex h-16 items-center justify-between">
-            {/* Logo */}
-            <div
-              className="flex items-center space-x-2 cursor-pointer"
-              onClick={() => router.push("/dashboard")}
-            >
-              <GraduationCap className="h-8 w-8 text-blue-600" />
-              <span className="text-xl font-bold">EduAI</span>
-            </div>
-
-            {/* Right side actions */}
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full" />
-              </Button>
-
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="flex items-center space-x-2"
-                  >
-                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                      <span className="text-sm font-medium text-blue-600">
-                        JD
-                      </span>
-                    </div>
-                    <span>John Doe</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => router.push("/settings")}>
-                    <User className="mr-2 h-4 w-4" /> Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => router.push("/settings")}>
-                    <Settings className="mr-2 h-4 w-4" /> Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="text-red-600"
-                    onClick={handleLogout}
-                  >
-                    <LogOut className="mr-2 h-4 w-4" /> Logout
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Navigation />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -344,47 +314,51 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {recentCourses.map((course) => (
-                    <div
-                      key={course.id}
-                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100"
-                      onClick={() => handleCourseClick(course.id)}
-                    >
-                      <div className="flex items-center space-x-4">
-                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                          <Book className="h-5 w-5 text-blue-600" />
-                        </div>
-                        <div>
-                          <div className="font-medium">{course.title}</div>
-                          <div className="text-sm text-gray-500">
-                            Last edited {course.lastEdited}
+                  {recentCourses.length == 0 ? (
+                    <p>No recent activity yet</p>
+                  ) : (
+                    recentCourses.map((course) => (
+                      <div
+                        key={course.id}
+                        className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100"
+                        onClick={() => handleCourseClick(course.id)}
+                      >
+                        <div className="flex items-center space-x-4">
+                          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <Book className="h-5 w-5 text-blue-600" />
+                          </div>
+                          <div>
+                            <div className="font-medium">{course.title}</div>
+                            <div className="text-sm text-gray-500">
+                              Last edited {course.lastEdited}
+                            </div>
                           </div>
                         </div>
+                        <div className="flex items-center space-x-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              router.push(`/course/${course.id}/edit`);
+                            }}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // Handle download
+                            }}
+                          >
+                            <Download className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            router.push(`/course/${course.id}/edit`);
-                          }}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            // Handle download
-                          }}
-                        >
-                          <Download className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -396,38 +370,44 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {recentActivity.map((activity) => (
-                    <div
-                      key={activity.id}
-                      className="flex items-center space-x-4"
-                    >
-                      <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                        {activity.type === "edit" ? (
-                          <Edit className="h-4 w-4 text-gray-600" />
-                        ) : (
-                          <Clock className="h-4 w-4 text-gray-600" />
-                        )}
-                      </div>
-                      <div>
-                        <div className="text-sm">
-                          You {activity.type}d{" "}
-                          <span className="font-medium">{activity.course}</span>
-                          {activity.is_published ? (
-                            <span className="ml-2 text-xs text-green-600">
-                              (Published)
-                            </span>
+                  {recentActivity.length == 0 ? (
+                    <p>No recent activity yet</p>
+                  ) : (
+                    recentActivity.map((activity) => (
+                      <div
+                        key={activity.id}
+                        className="flex items-center space-x-4"
+                      >
+                        <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                          {activity.type === "edit" ? (
+                            <Edit className="h-4 w-4 text-gray-600" />
                           ) : (
-                            <span className="ml-2 text-xs text-gray-500">
-                              (Draft)
-                            </span>
+                            <Clock className="h-4 w-4 text-gray-600" />
                           )}
                         </div>
-                        <div className="text-xs text-gray-500">
-                          {activity.time} • {activity.subject}
+                        <div>
+                          <div className="text-sm">
+                            You {activity.type}ed{" "}
+                            <span className="font-medium">
+                              {activity.course}
+                            </span>
+                            {activity.is_published ? (
+                              <span className="ml-2 text-xs text-green-600">
+                                (Published)
+                              </span>
+                            ) : (
+                              <span className="ml-2 text-xs text-gray-500">
+                                (Draft)
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {activity.time} • {activity.subject.toUpperCase()}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </CardContent>
             </Card>

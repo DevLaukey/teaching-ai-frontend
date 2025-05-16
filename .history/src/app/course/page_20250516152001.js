@@ -52,6 +52,7 @@ import {
   BarChart,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie"; // Import js-cookie
 
 const MyCourses = () => {
   const router = useRouter();
@@ -69,7 +70,9 @@ const MyCourses = () => {
   const fetchCourses = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
+      // Get token from cookies instead of localStorage
+      const token = Cookies.get("authToken");
+
       if (!token) {
         throw new Error("No authentication token found");
       }
@@ -91,7 +94,6 @@ const MyCourses = () => {
 
       const data = await response.json();
 
-      console.log(data);
       // Transform the API data to match our component's expected format
       const transformedCourses = data.map((course) => ({
         id: course.id,
@@ -203,7 +205,9 @@ const MyCourses = () => {
 
   const deleteCourses = async (courseIds) => {
     try {
-      const token = localStorage.getItem("token");
+      // Get token from cookies instead of localStorage
+      const token = Cookies.get("authToken");
+
       if (!token) {
         throw new Error("No authentication token found");
       }

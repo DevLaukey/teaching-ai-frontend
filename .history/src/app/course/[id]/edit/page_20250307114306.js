@@ -409,7 +409,7 @@ const [mediaType, setMediaType] = useState(null);
                             onChange={(e) => handleMediaChange(e, field)}
                             className="hidden"
                             id="media-upload"
-                          /> 
+                          />
                           <label
                             htmlFor="media-upload"
                             className="cursor-pointer text-xs sm:text-sm text-gray-600 hover:text-gray-800 text-center"
