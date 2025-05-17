@@ -109,9 +109,6 @@ const LandingPage = () => {
   const handleAuthNavigation = () => {
     router.push("/auth/login");
   };
-  const handleRegNavigation = () => {
-    router.push("/auth/register")
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
@@ -152,7 +149,7 @@ const LandingPage = () => {
             Log In
           </Button>
           <Button
-            onClick={handleRegNavigation}
+            onClick={handleAuthNavigation}
             className="bg-blue-600 hover:bg-blue-700"
           >
             Sign Up Free
@@ -202,7 +199,7 @@ const LandingPage = () => {
             <Button
               size="lg"
               className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-4"
-              onClick={handleRegNavigation}
+              onClick={handleAuthNavigation}
             >
               Start Creating for Free
               <ChevronRight className="ml-2 h-5 w-5" />
@@ -387,7 +384,7 @@ const LandingPage = () => {
             <Button
               size="lg"
               className="bg-white text-blue-600 hover:bg-gray-100 text-lg px-8 py-4"
-              onClick={handleRegNavigation}
+              onClick={handleAuthNavigation}
             >
               Start Free Today
               <ArrowRight className="ml-2 h-5 w-5" />

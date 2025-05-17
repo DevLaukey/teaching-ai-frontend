@@ -109,9 +109,6 @@ const LandingPage = () => {
   const handleAuthNavigation = () => {
     router.push("/auth/login");
   };
-  const handleRegNavigation = () => {
-    router.push("/auth/register")
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
@@ -152,7 +149,7 @@ const LandingPage = () => {
             Log In
           </Button>
           <Button
-            onClick={handleRegNavigation}
+            onClick={handleAuthNavigation}
             className="bg-blue-600 hover:bg-blue-700"
           >
             Sign Up Free
@@ -202,7 +199,7 @@ const LandingPage = () => {
             <Button
               size="lg"
               className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-4"
-              onClick={handleRegNavigation}
+              onClick={handleAuthNavigation}
             >
               Start Creating for Free
               <ChevronRight className="ml-2 h-5 w-5" />
@@ -387,7 +384,7 @@ const LandingPage = () => {
             <Button
               size="lg"
               className="bg-white text-blue-600 hover:bg-gray-100 text-lg px-8 py-4"
-              onClick={handleRegNavigation}
+              onClick={handleAuthNavigation}
             >
               Start Free Today
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -399,7 +396,82 @@ const LandingPage = () => {
         </div>
       </section>
 
-   
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-12">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid md:grid-cols-4 gap-8">
+            <div>
+              <div className="flex items-center space-x-2 mb-4">
+                <GraduationCap className="h-8 w-8 text-blue-400" />
+                <span className="text-xl font-bold">EduAI</span>
+              </div>
+              <p className="text-gray-400 text-sm">
+                Empowering educators with AI-powered course creation tools.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-4">Product</h3>
+              <ul className="space-y-2 text-sm text-gray-400">
+                <li>
+                  <a href="#" className="hover:text-white">
+                    Features
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white">
+                    Templates
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-4">Support</h3>
+              <ul className="space-y-2 text-sm text-gray-400">
+                <li>
+                  <a href="#" className="hover:text-white">
+                    Help Center
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white">
+                    Contact Us
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white">
+                    Community
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-4">Company</h3>
+              <ul className="space-y-2 text-sm text-gray-400">
+                <li>
+                  <a href="#" className="hover:text-white">
+                    About
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white">
+                    Blog
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white">
+                    Careers
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center">
+            <p className="text-gray-400 text-sm">
+              © 2025 EduAI. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
